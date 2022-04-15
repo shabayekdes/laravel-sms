@@ -2,6 +2,7 @@
 
 namespace Shabayek\Sms\Providers;
 
+use Shabayek\Sms\SmsManager;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -30,5 +31,9 @@ class SmsServiceProvider extends ServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(__DIR__.'/../../config/sms.php', 'sms');
+
+        $this->app->bind('sms', function () {
+            return new SmsManager($this->app);
+        });
     }
 }
