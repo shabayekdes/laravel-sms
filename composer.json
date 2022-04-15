@@ -1,0 +1,63 @@
+{
+    "name": "shabayek/laravel-sms",
+    "description": "Laravel Package For SMS Sending",
+    "keywords": [
+        "laravel",
+        "sms",
+        "smseg",
+        "smsmisr",
+        "package"
+    ],
+    "homepage": "https://github.com/shabayekdes/laravel-sms",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Esmail Shabayek",
+            "email": "esmail.shabayek@gmail.com",
+            "homepage": "https://github.com/shabayekdes",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.3",
+        "guzzlehttp/guzzle": "^7.4",
+        "illuminate/contracts": "^8.0"
+    },
+    "require-dev": {
+        "nunomaduro/collision": "^5.10",
+        "mockery/mockery": "dev-master",
+        "orchestra/testbench": "^6.0",
+        "phpunit/phpunit": "^9.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Shabayek\\Sms\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Shabayek\\Sms\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-f": "vendor/bin/phpunit --filter"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Shabayek\\Sms\\Providers\\SmsServiceProvider"
+            ],
+            "aliases": {
+                "Sms": "Shabayek\\Sms\\Facade"
+            }
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
