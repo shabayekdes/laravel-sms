@@ -45,7 +45,7 @@ class SmsNull implements SmsGatewayContract
      */
     public function verify($phone, $otp): bool
     {
-        return true
+        return true;
     }
     /**
      * Get balance
