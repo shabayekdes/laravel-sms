@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Facade;
 
 /**
  * Sms Facade class.
+ *
  * @author Esmail Shabayek <esmail.shabayek@gmail.com>
  */
 class Sms extends Facade

@@ -2,11 +2,12 @@
 
 namespace Shabayek\Sms\Providers;
 
-use Shabayek\Sms\SmsManager;
 use Illuminate\Support\ServiceProvider;
+use Shabayek\Sms\SmsManager;
 
 /**
  * SmsServiceProvider class.
+ *
  * @author Esmail Shabayek <esmail.shabayek@gmail.com>
  */
 class SmsServiceProvider extends ServiceProvider
