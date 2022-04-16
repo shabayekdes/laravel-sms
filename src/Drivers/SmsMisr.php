@@ -11,7 +11,7 @@ class SmsMisr implements SmsGatewayContract
     const SMS_NORMAL_SERVICE = 'normal';
     const SMS_OTP_SERVICE = 'otp';
 
-    private $base_url = 'https://smsmisr.com/api/';
+    private $base_url = 'https://smsmisr.com/api';
     private $username;
     private $password;
     private $sender_id;
