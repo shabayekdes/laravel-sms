@@ -6,7 +6,9 @@ use Illuminate\Support\Manager;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Shabayek\Sms\Drivers\SmsEg;
+use Shabayek\Sms\Drivers\SmsMisr;
 use Shabayek\Sms\Drivers\SmsNull;
+use Shabayek\Sms\Drivers\VictoryLink;
 
 /**
  * SMS Manager class.
@@ -74,7 +76,7 @@ class SmsManager extends Manager
     }
 
     /**
-     * Create an instance of the Null sms driver.
+     * Create an instance of the sms eg driver.
      *
      * @param  array  $config
      * @return \Shabayek\Sms\Drivers\SmsEg
@@ -82,6 +84,28 @@ class SmsManager extends Manager
     protected function createSmsegDriver(array $config): SmsEg
     {
         return new SmsEg($config);
+    }
+
+    /**
+     * Create an instance of the sms misr driver.
+     *
+     * @param  array  $config
+     * @return \Shabayek\Sms\Drivers\SmsMisr
+     */
+    protected function createSmsmisrDriver(array $config): SmsMisr
+    {
+        return new SmsMisr($config);
+    }
+
+    /**
+     * Create an instance of the sms victory link driver.
+     *
+     * @param  array  $config
+     * @return \Shabayek\Sms\Drivers\VictoryLink
+     */
+    protected function createVictorylinkDriver(array $config): VictoryLink
+    {
+        return new VictoryLink($config);
     }
 
     /**

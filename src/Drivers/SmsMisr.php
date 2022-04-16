@@ -6,24 +6,23 @@ use Exception;
 use Illuminate\Support\Facades\Http;
 use Shabayek\Sms\Contracts\SmsGatewayContract;
 
-/**
- * SmsEg class.
- *
- * @author Esmail Shabayek <esmail.shabayek@gmail.com>
- */
-class SmsEg implements SmsGatewayContract
+class SmsMisr implements SmsGatewayContract
 {
     const SMS_NORMAL_SERVICE = 'normal';
     const SMS_OTP_SERVICE = 'otp';
 
-    private $base_url = 'https://smssmartegypt.com/sms/api';
-    private $service;
+    private $base_url = 'https://smsmisr.com/api';
     private $username;
     private $password;
     private $sender_id;
 
+    private $msignature;
+    private $sms_id;
+    private $token;
+    private $language;
+
     /**
-     * SmsEg Constructor.
+     * SmsMisr Constructor.
      *
      * @param  array  $config
      * @return void
@@ -31,9 +30,15 @@ class SmsEg implements SmsGatewayContract
     public function __construct(array $config)
     {
         $this->service = $config['service'];
+
         $this->username = $config['username'];
         $this->password = $config['password'];
         $this->sender_id = $config['sender_id'];
+
+        $this->language = $this->getLanguage();
+        $this->token = $config['token'];
+        $this->msignature = $config['msignature'];
+        $this->sms_id = $config['sms_id'];
     }
 
     /**
@@ -49,9 +54,9 @@ class SmsEg implements SmsGatewayContract
         $success = true;
         $message = 'Message sent successfully';
 
-        if (isset($response['type']) && $response['type'] == 'error') {
+        if (isset($response['code']) && $response['code'] != 1901) {
             $success = false;
-            $message = data_get($response, 'error.msg', 'Message not sent successfully');
+            $message = 'Message not sent successfully';
         }
 
         return [
@@ -69,14 +74,13 @@ class SmsEg implements SmsGatewayContract
      */
     public function sendOtp($phone, $message = null)
     {
-        $code = null;
+        $code = $this->generateCode();
 
         if ($this->service == self::SMS_OTP_SERVICE) {
-            $this->sendOtpRequest($phone);
+            $this->sendOtpRequest($phone, $code);
         }
 
         if ($this->service == self::SMS_NORMAL_SERVICE) {
-            $code = $this->generateCode();
             if (is_null($message)) {
                 $message = 'Your verification code is: '.$code;
             }
@@ -95,9 +99,6 @@ class SmsEg implements SmsGatewayContract
      */
     public function verify($phone, $otp): bool
     {
-        if ($this->service == self::SMS_OTP_SERVICE) {
-            return $this->verifyOtpRequest($phone, $otp);
-        }
         throw new Exception('This service is not supported');
     }
 
@@ -111,14 +112,39 @@ class SmsEg implements SmsGatewayContract
         $params = [
             'username' => $this->username,
             'password' => $this->password,
+            'SMSID' => $this->sms_id,
+            'request' => 'status',
         ];
-        $response = Http::post($this->base_url.'/getBalance', $params);
+
+        $response = Http::post($this->base_url.'/Request?'.http_build_query($params));
         $result = $response->json();
-        if (isset($result['type']) && $result['type'] == 'error') {
+
+        if (isset($result['code']) && $result['code'] == 'Error') {
             return 0;
         }
 
-        return $result['data']['points'];
+        return $result['balance'];
+    }
+
+    /**
+     * Send sms with otp services.
+     *
+     * @param  string  $phone
+     * @param  int  $code
+     * @return void
+     */
+    private function sendOtpRequest($phone, $code)
+    {
+        $params = [
+            'Username' => $this->username,
+            'password' => $this->password,
+            'SMSID' => $this->sms_id,
+            'Msignature' => $this->msignature,
+            'Token' => $this->token,
+            'Mobile' => $phone,
+            'Code' => $code,
+        ];
+        Http::post($this->base_url.'/vSMS', $params);
     }
 
     /**
@@ -131,61 +157,18 @@ class SmsEg implements SmsGatewayContract
     private function sendMessageRequest($phone, $message)
     {
         $params = [
-            'username' => $this->username,
+            'Username' => $this->username,
             'password' => $this->password,
-            'sendername' => $this->sender_id,
-            'mobiles' => $phone,
+            'language' => $this->language,
+            'sender' => $this->sender_id,
+            'Mobile' => $phone,
             'message' => $message,
+            'DelayUntil' => null,
         ];
 
-        $response = Http::post($this->base_url, $params);
+        $response = Http::post($this->base_url.'/v2', $params);
 
         return $response->json();
-    }
-
-    /**
-     * Send sms with otp services.
-     *
-     * @param  string  $phone
-     * @return void
-     */
-    private function sendOtpRequest($phone)
-    {
-        $params = [
-            'username' => $this->username,
-            'password' => $this->password,
-            'sender' => $this->sender_id,
-            'mobile' => $phone,
-            'lang' => 'ar',
-        ];
-        Http::post($this->base_url.'/otp-send', $params);
-    }
-
-    /**
-     * Verify otp for user.
-     *
-     * @param  string|int  $phone
-     * @param  string  $otp
-     * @return bool
-     */
-    private function verifyOtpRequest($phone, $otp)
-    {
-        $params = [
-            'username' => $this->username,
-            'password' => $this->password,
-            'mobile' => $phone,
-            'otp' => $otp,
-            'verify' => true,
-        ];
-        $response = Http::post($this->base_url.'/otp-check', $params);
-
-        $result = $response->json();
-
-        if (isset($result['type']) && $result['type'] == 'success') {
-            return true;
-        }
-
-        return false;
     }
 
     /**
@@ -202,5 +185,27 @@ class SmsEg implements SmsGatewayContract
         }
 
         return $code;
+    }
+
+    /**
+     * Get message language.
+     *
+     * @return int
+     */
+    private function getLanguage()
+    {
+        switch (config('sms.language')) {
+            case 'en':
+                $locale = 1;
+                break;
+            case 'ar':
+                $locale = 2;
+                break;
+            default:
+                $locale = 3;
+                break;
+        }
+
+        return $locale;
     }
 }
