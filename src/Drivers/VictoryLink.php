@@ -43,7 +43,7 @@ class VictoryLink implements SmsGatewayContract
     {
         $response = $this->sendMessageRequest($phone, $message);
 
-        $success = $response !== '0';
+        $success = $response[0] === '0';
         $message = $success ? 'Message sent successfully' : 'Message not sent successfully';
 
         return [
@@ -123,7 +123,7 @@ class VictoryLink implements SmsGatewayContract
             'SMSText' => $message
         ];
 
-        $response = Http::get('https://smsvas.vlserv.com/KannelSending/service.asmx/SendSMSWithDLR?'. http_build_query($params));
+        $response = Http::get('https://smsvas.vlserv.com/KannelSending/service.asmx/SendSMS?'. http_build_query($params));
 
         $xml = simplexml_load_string($response->body());
         return json_decode(json_encode((array)$xml), TRUE);
