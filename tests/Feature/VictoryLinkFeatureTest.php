@@ -21,16 +21,16 @@ class VictoryLinkFeatureTest extends TestCase
             'UserName' => 'test',
             'Password' => 'secret',
             'SMSSender' => 'test',
-            "SMSLang" => 'A',
+            'SMSLang' => 'A',
             'SMSReceiver' => '0123456789',
-            'SMSText' => 'test message'
+            'SMSText' => 'test message',
         ];
         config()->set('sms.connections.victorylink.username', $params['UserName']);
         config()->set('sms.connections.victorylink.password', $params['Password']);
         config()->set('sms.connections.victorylink.sender_id', $params['SMSSender']);
 
         Http::fake([
-            'https://smsvas.vlserv.com/KannelSending/service.asmx/SendSMS?'. http_build_query($params) => Http::response('<?xml version="1.0" encoding="utf-8"?><int xmlns="http://tempuri.org/">0</int>', 200),
+            'https://smsvas.vlserv.com/KannelSending/service.asmx/SendSMS?'.http_build_query($params) => Http::response('<?xml version="1.0" encoding="utf-8"?><int xmlns="http://tempuri.org/">0</int>', 200),
         ]);
 
         $sms = Sms::send($params['SMSReceiver'], $params['SMSText']);
@@ -47,16 +47,16 @@ class VictoryLinkFeatureTest extends TestCase
             'UserName' => 'test',
             'Password' => 'secret',
             'SMSSender' => 'test',
-            "SMSLang" => 'A',
+            'SMSLang' => 'A',
             'SMSReceiver' => '0123456789',
-            'SMSText' => 'test message'
+            'SMSText' => 'test message',
         ];
         config()->set('sms.connections.victorylink.username', $params['UserName']);
         config()->set('sms.connections.victorylink.password', $params['Password']);
         config()->set('sms.connections.victorylink.sender_id', $params['SMSSender']);
 
         Http::fake([
-            'https://smsvas.vlserv.com/KannelSending/service.asmx/SendSMS?'. http_build_query($params) => Http::response('<?xml version="1.0" encoding="utf-8"?><int xmlns="http://tempuri.org/">-1</int>', 200),
+            'https://smsvas.vlserv.com/KannelSending/service.asmx/SendSMS?'.http_build_query($params) => Http::response('<?xml version="1.0" encoding="utf-8"?><int xmlns="http://tempuri.org/">-1</int>', 200),
         ]);
 
         $sms = Sms::send($params['SMSReceiver'], $params['SMSText']);
