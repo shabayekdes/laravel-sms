@@ -7,13 +7,12 @@ use Illuminate\Support\Facades\Http;
 use Shabayek\Sms\Contracts\SmsGatewayContract;
 
 /**
- * VictoryLink class
+ * VictoryLink class.
  *
  * @author Esmail Shabayek <esmail.shabayek@gmail.com>
  */
 class VictoryLink implements SmsGatewayContract
 {
-
     protected $base_url = 'https://smsvas.vlserv.com/KannelSending/service.asmx';
     protected $username;
     protected $password;
@@ -22,7 +21,7 @@ class VictoryLink implements SmsGatewayContract
     /**
      * VictoryLink Constructor.
      *
-     * @param array $config
+     * @param  array  $config
      * @return void
      */
     public function __construct(array $config)
@@ -69,7 +68,6 @@ class VictoryLink implements SmsGatewayContract
         }
         $this->send($phone, $message);
 
-
         return $code;
     }
 
@@ -97,10 +95,10 @@ class VictoryLink implements SmsGatewayContract
             'Password' => $this->password,
         ];
 
-        $response = Http::get($this->base_url. '/CheckCredit?'. http_build_query($params));
+        $response = Http::get($this->base_url.'/CheckCredit?'.http_build_query($params));
 
         $xml = simplexml_load_string($response->body());
-        $result = json_decode(json_encode((array)$xml), true);
+        $result = json_decode(json_encode((array) $xml), true);
 
         return $result[0];
     }
@@ -118,16 +116,18 @@ class VictoryLink implements SmsGatewayContract
             'UserName' => $this->username,
             'Password' => $this->password,
             'SMSSender' => $this->sender_id,
-            "SMSLang" => $this->getLanguage(),
+            'SMSLang' => $this->getLanguage(),
             'SMSReceiver' => $phone,
-            'SMSText' => $message
+            'SMSText' => $message,
         ];
 
-        $response = Http::get('https://smsvas.vlserv.com/KannelSending/service.asmx/SendSMSWithDLR?'. http_build_query($params));
+        $response = Http::get('https://smsvas.vlserv.com/KannelSending/service.asmx/SendSMSWithDLR?'.http_build_query($params));
 
         $xml = simplexml_load_string($response->body());
-        return json_decode(json_encode((array)$xml), TRUE);
+
+        return json_decode(json_encode((array) $xml), true);
     }
+
     /**
      * Generate otp code.
      *
@@ -143,6 +143,7 @@ class VictoryLink implements SmsGatewayContract
 
         return $code;
     }
+
     /**
      * Get message language.
      *
