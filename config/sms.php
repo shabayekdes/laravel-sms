@@ -53,7 +53,7 @@ return [
         | Sms EG Connection
         |--------------------------------------------------------------------------
         |
-        | Here are credentials for sms eg company. Of course There are
+        | Here are credentials for sms misr company. Of course There are
         | two types of service you can choose one of:
         | normal => using message service
         | otp => using otp service
@@ -69,6 +69,22 @@ return [
             'token' => env('SMS_TOKEN'),
             'msignature' => env('SMS_MSIGNATURE'),
             'sms_id' => env('SMS_SMS_ID'),
+        ],
+
+        /*
+        |--------------------------------------------------------------------------
+        | Sms EG Connection
+        |--------------------------------------------------------------------------
+        |
+        | Here are credentials for sms victory link company.
+        |
+        */
+
+        'victorylink' => [
+            'driver'    => 'victorylink',
+            'username'  => env('SMS_USERNAME'),
+            'password'  => env('SMS_PASSWORD'),
+            'sender_id' => env('SMS_SENDER_ID'),
         ],
     ],
 
