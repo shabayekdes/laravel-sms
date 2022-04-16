@@ -51,7 +51,7 @@ class SmsEg implements SmsGatewayContract
 
         if (isset($response['type']) && $response['type'] == 'error') {
             $success = false;
-            $message = data_get($response, 'error.msg', 'Message sent successfully');
+            $message = data_get($response, 'error.msg', 'Message not sent successfully');
         }
 
         return [
@@ -72,11 +72,11 @@ class SmsEg implements SmsGatewayContract
         $code = null;
 
         if ($this->service == self::SMS_OTP_SERVICE) {
-            $this->sendOtpRequest($phone, $message);
+            $this->sendOtpRequest($phone);
         }
 
         if ($this->service == self::SMS_NORMAL_SERVICE) {
-            $code = $this->generateCode($phone, $message);
+            $code = $this->generateCode();
             if (is_null($message)) {
                 $message = 'Your verification code is: '.$code;
             }
