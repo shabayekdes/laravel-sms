@@ -1,0 +1,89 @@
+<?php
+
+namespace Shabayek\Sms;
+
+use Illuminate\Support\Str;
+use InvalidArgumentException;
+use Illuminate\Support\Manager;
+use Shabayek\Sms\Drivers\SmsEg;
+use Shabayek\Sms\Drivers\SmsNull;
+
+/**
+ * SMS Manager class.
+ */
+class SmsManager extends Manager
+{
+    /**
+     * The application instance.
+     *
+     * @var \Illuminate\Contracts\Foundation\Application
+     */
+    protected $app;
+    /**
+     * Create a new sms manager instance.
+     *
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @return void
+     */
+    public function __construct($app)
+    {
+        $this->app = $app;
+    }
+    /**
+     * Create a new driver instance.
+     *
+     * @param  string  $driver
+     * @return mixed
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function createDriver($driver)
+    {
+        $config = $this->getConfig($driver);
+
+        if (is_null($config)) {
+            throw new InvalidArgumentException("Cache store [{$driver}] is not defined.");
+        }
+
+        $method = 'create'.Str::studly($config['driver']).'Driver';
+
+        if (method_exists($this, $method)) {
+            return $this->$method($config);
+        }
+
+        throw new InvalidArgumentException("Driver [$driver] not supported.");
+    }
+    /**
+     * Get the cache connection configuration.
+     *
+     * @param  string  $name
+     * @return array
+     */
+    protected function getConfig($name)
+    {
+        if (! is_null($name) && $name !== 'null') {
+            return $this->app['config']["sms.connections.{$name}"];
+        }
+
+        return ['driver' => 'null'];
+    }
+    /**
+     * Create an instance of the Null sms driver.
+     *
+     * @param array $config
+     * @return \Shabayek\Sms\Drivers\SmsEg
+     */
+    protected function createSmsegDriver(array $config): SmsEg
+    {
+        return new SmsEg($config);
+    }
+    /**
+     * Get the default driver name.
+     *
+     * @return string
+     */
+    public function getDefaultDriver()
+    {
+        return $this->app['config']['sms.default'];
+    }
+}
