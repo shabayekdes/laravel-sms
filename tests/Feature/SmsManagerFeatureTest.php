@@ -10,11 +10,11 @@ use Shabayek\Sms\Facade\Sms;
 use Shabayek\Sms\Tests\TestCase;
 
 /**
- * SmsManagerTest class.
+ * SmsManagerFeatureTest class.
  *
  * @author Esmail Shabayek <esmail.shabayek@gmail.com>
  */
-class SmsManager extends TestCase
+class SmsManagerFeatureTest extends TestCase
 {
     /** @test */
     public function it_can_sms_manager_instance_of_smseg()
