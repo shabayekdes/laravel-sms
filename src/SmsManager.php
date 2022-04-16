@@ -10,6 +10,8 @@ use Shabayek\Sms\Drivers\SmsNull;
 
 /**
  * SMS Manager class.
+ *
+ * @author Esmail Shabayek <esmail.shabayek@gmail.com>
  */
 class SmsManager extends Manager
 {
@@ -76,6 +78,16 @@ class SmsManager extends Manager
     protected function createSmsegDriver(array $config): SmsEg
     {
         return new SmsEg($config);
+    }
+    /**
+     * Create an instance of the Null sms driver.
+     *
+     * @param array $config
+     * @return \Shabayek\Sms\Drivers\SmsNull
+     */
+    protected function createNullDriver(array $config): SmsNull
+    {
+        return new SmsNull($config);
     }
     /**
      * Get the default driver name.
