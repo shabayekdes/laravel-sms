@@ -12,43 +12,46 @@ use Shabayek\Sms\Contracts\SmsGatewayContract;
 class SmsNull implements SmsGatewayContract
 {
     /**
-     * Send sms message
+     * Send sms message.
      *
-     * @param  string $phone
-     * @param  string $message
-     * @return  array
+     * @param  string  $phone
+     * @param  string  $message
+     * @return array
      */
     public function send($phone, $message): array
     {
         return [
             'success' => false,
-            'message' => 'SMS driver is disabled'
+            'message' => 'SMS driver is disabled',
         ];
     }
+
     /**
-     * send otp verification
+     * send otp verification.
      *
-     * @param  string $phone
-     * @param  string|null $message
-     * @return integer|null
+     * @param  string  $phone
+     * @param  string|null  $message
+     * @return int|null
      */
     public function sendOtp($phone, $message = null)
     {
         return null;
     }
+
     /**
-     * Verify phone number
+     * Verify phone number.
      *
-     * @param string|int $phone
-     * @param  string $otp
+     * @param  string|int  $phone
+     * @param  string  $otp
      * @return bool
      */
     public function verify($phone, $otp): bool
     {
         return true;
     }
+
     /**
-     * Get balance
+     * Get balance.
      *
      * @return int
      */
