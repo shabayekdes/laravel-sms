@@ -8,6 +8,7 @@ use Shabayek\Sms\Contracts\SmsGatewayContract;
 
 /**
  * SmsEg class.
+ *
  * @author Esmail Shabayek <esmail.shabayek@gmail.com>
  */
 class SmsEg implements SmsGatewayContract
@@ -15,7 +16,7 @@ class SmsEg implements SmsGatewayContract
     const SMS_NORMAL_SERVICE = 'normal';
     const SMS_OTP_SERVICE = 'otp';
 
-    private $base_url = "https://smssmartegypt.com/sms/api";
+    private $base_url = 'https://smssmartegypt.com/sms/api';
     private $service;
     private $username;
     private $password;
@@ -24,7 +25,7 @@ class SmsEg implements SmsGatewayContract
     /**
      * SmsEg Constructor.
      *
-     * @param array $config
+     * @param  array  $config
      * @return void
      */
     public function __construct(array $config)
@@ -34,18 +35,19 @@ class SmsEg implements SmsGatewayContract
         $this->password = $config['password'];
         $this->sender_id = $config['sender_id'];
     }
+
     /**
-     * Send sms message
+     * Send sms message.
      *
-     * @param  string $phone
-     * @param  string $message
-     * @return  array
+     * @param  string  $phone
+     * @param  string  $message
+     * @return array
      */
     public function send($phone, $message): array
     {
         $response = $this->sendMessageRequest($phone, $message);
         $success = true;
-        $message = "Message sent successfully";
+        $message = 'Message sent successfully';
 
         if (isset($response['type']) && $response['type'] == 'error') {
             $success = false;
@@ -54,15 +56,16 @@ class SmsEg implements SmsGatewayContract
 
         return [
             'success' => $success,
-            'message' => $message
+            'message' => $message,
         ];
     }
+
     /**
-     * send otp verification
+     * send otp verification.
      *
-     * @param  string|int $phone
-     * @param  string|null $message
-     * @return integer|null
+     * @param  string|int  $phone
+     * @param  string|null  $message
+     * @return int|null
      */
     public function sendOtp($phone, $message = null)
     {
@@ -75,18 +78,19 @@ class SmsEg implements SmsGatewayContract
         if ($this->service == self::SMS_NORMAL_SERVICE) {
             $code = $this->generateCode($phone, $message);
             if (is_null($message)) {
-                $message = 'Your verification code is: ' . $code;
+                $message = 'Your verification code is: '.$code;
             }
             $this->send($phone, $message);
         }
 
         return $code;
     }
+
     /**
-     * Verify phone number
+     * Verify phone number.
      *
-     * @param string|int $phone
-     * @param  string $otp
+     * @param  string|int  $phone
+     * @param  string  $otp
      * @return bool
      */
     public function verify($phone, $otp): bool
@@ -94,10 +98,11 @@ class SmsEg implements SmsGatewayContract
         if ($this->service == self::SMS_OTP_SERVICE) {
             return $this->verifyOtpRequest($phone, $otp);
         }
-        throw new Exception("This service is not supported");
+        throw new Exception('This service is not supported');
     }
+
     /**
-     * Get balance
+     * Get balance.
      *
      * @return int
      */
@@ -105,21 +110,23 @@ class SmsEg implements SmsGatewayContract
     {
         $params = [
             'username' => $this->username,
-            'password' => $this->password
+            'password' => $this->password,
         ];
-        $response = Http::post($this->base_url . '/getBalance', $params);
+        $response = Http::post($this->base_url.'/getBalance', $params);
         $result = $response->json();
         if (isset($result['type']) && $result['type'] == 'error') {
             return 0;
         }
+
         return $result['data']['points'];
     }
+
     /**
-     * Send sms with message services
+     * Send sms with message services.
      *
-     * @param  string $phone
-     * @param  string $message
-     * @return  array
+     * @param  string  $phone
+     * @param  string  $message
+     * @return array
      */
     private function sendMessageRequest($phone, $message)
     {
@@ -128,18 +135,19 @@ class SmsEg implements SmsGatewayContract
             'password' => $this->password,
             'sendername' => $this->sender_id,
             'mobiles' => $phone,
-            'message' => $message
+            'message' => $message,
         ];
 
         $response = Http::post($this->base_url, $params);
 
         return $response->json();
     }
+
     /**
-     * Send sms with otp services
+     * Send sms with otp services.
      *
-     * @param  string $phone
-     * @return  void
+     * @param  string  $phone
+     * @return void
      */
     private function sendOtpRequest($phone)
     {
@@ -148,16 +156,16 @@ class SmsEg implements SmsGatewayContract
             'password' => $this->password,
             'sender' => $this->sender_id,
             'mobile' => $phone,
-            "lang" => "ar"
+            'lang' => 'ar',
         ];
-        Http::post($this->base_url . '/otp-send', $params);
+        Http::post($this->base_url.'/otp-send', $params);
     }
 
     /**
-     * Verify otp for user
+     * Verify otp for user.
      *
-     * @param string|int $phone
-     * @param string $otp
+     * @param  string|int  $phone
+     * @param  string  $otp
      * @return bool
      */
     private function verifyOtpRequest($phone, $otp)
@@ -167,9 +175,9 @@ class SmsEg implements SmsGatewayContract
             'password' => $this->password,
             'mobile' => $phone,
             'otp' => $otp,
-            'verify' => true
+            'verify' => true,
         ];
-        $response = Http::post($this->base_url . '/otp-check', $params);
+        $response = Http::post($this->base_url.'/otp-check', $params);
 
         $result = $response->json();
 
@@ -179,8 +187,9 @@ class SmsEg implements SmsGatewayContract
 
         return false;
     }
+
     /**
-     * Generate otp code
+     * Generate otp code.
      *
      * @return int
      */
@@ -188,10 +197,10 @@ class SmsEg implements SmsGatewayContract
     {
         if (app()->environment('production')) {
             $code = rand(100000, 999999);
-        }
-        else {
+        } else {
             $code = 1234;
         }
+
         return $code;
     }
 }

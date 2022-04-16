@@ -2,9 +2,9 @@
 
 namespace Shabayek\Sms;
 
+use Illuminate\Support\Manager;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
-use Illuminate\Support\Manager;
 use Shabayek\Sms\Drivers\SmsEg;
 use Shabayek\Sms\Drivers\SmsNull;
 
@@ -21,6 +21,7 @@ class SmsManager extends Manager
      * @var \Illuminate\Contracts\Foundation\Application
      */
     protected $app;
+
     /**
      * Create a new sms manager instance.
      *
@@ -31,6 +32,7 @@ class SmsManager extends Manager
     {
         $this->app = $app;
     }
+
     /**
      * Create a new driver instance.
      *
@@ -55,6 +57,7 @@ class SmsManager extends Manager
 
         throw new InvalidArgumentException("Driver [$driver] not supported.");
     }
+
     /**
      * Get the cache connection configuration.
      *
@@ -69,26 +72,29 @@ class SmsManager extends Manager
 
         return ['driver' => 'null'];
     }
+
     /**
      * Create an instance of the Null sms driver.
      *
-     * @param array $config
+     * @param  array  $config
      * @return \Shabayek\Sms\Drivers\SmsEg
      */
     protected function createSmsegDriver(array $config): SmsEg
     {
         return new SmsEg($config);
     }
+
     /**
      * Create an instance of the Null sms driver.
      *
-     * @param array $config
+     * @param  array  $config
      * @return \Shabayek\Sms\Drivers\SmsNull
      */
     protected function createNullDriver(array $config): SmsNull
     {
         return new SmsNull($config);
     }
+
     /**
      * Get the default driver name.
      *
