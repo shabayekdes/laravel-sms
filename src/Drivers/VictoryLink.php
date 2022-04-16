@@ -121,7 +121,7 @@ class VictoryLink implements SmsGatewayContract
             'SMSText' => $message,
         ];
 
-        $response = Http::get('https://smsvas.vlserv.com/KannelSending/service.asmx/SendSMS?'. http_build_query($params));
+        $response = Http::get('https://smsvas.vlserv.com/KannelSending/service.asmx/SendSMS?'.http_build_query($params));
 
         $xml = simplexml_load_string($response->body());
 
