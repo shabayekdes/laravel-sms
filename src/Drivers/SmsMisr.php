@@ -1,4 +1,5 @@
 <?php
+
 namespace Shabayek\Sms\Drivers;
 
 use Exception;
@@ -39,6 +40,7 @@ class SmsMisr implements SmsGatewayContract
         $this->msignature = $config['msignature'];
         $this->sms_id = $config['sms_id'];
     }
+
     /**
      * Send sms message.
      *
@@ -62,6 +64,7 @@ class SmsMisr implements SmsGatewayContract
             'message' => $message,
         ];
     }
+
     /**
      * send otp verification.
      *
@@ -86,6 +89,7 @@ class SmsMisr implements SmsGatewayContract
 
         return $code;
     }
+
     /**
      * Verify phone number.
      *
@@ -112,12 +116,13 @@ class SmsMisr implements SmsGatewayContract
             'request' => 'status',
         ];
 
-        $response = Http::post($this->base_url. '/Request?' . http_build_query($params));
+        $response = Http::post($this->base_url.'/Request?'.http_build_query($params));
         $result = $response->json();
 
-        if (isset($result['code']) && $result['code'] == "Error") {
+        if (isset($result['code']) && $result['code'] == 'Error') {
             return 0;
         }
+
         return $result['balance'];
     }
 
@@ -137,10 +142,11 @@ class SmsMisr implements SmsGatewayContract
             'Msignature' => $this->msignature,
             'Token' => $this->token,
             'Mobile' => $phone,
-            'Code' => $code
+            'Code' => $code,
         ];
         Http::post($this->base_url.'/vSMS', $params);
     }
+
     /**
      * Send sms with message services.
      *
@@ -160,10 +166,11 @@ class SmsMisr implements SmsGatewayContract
             'DelayUntil' => null,
         ];
 
-        $response = Http::post($this->base_url . '/v2', $params);
+        $response = Http::post($this->base_url.'/v2', $params);
 
         return $response->json();
     }
+
     /**
      * Generate otp code.
      *
