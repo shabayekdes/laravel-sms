@@ -28,11 +28,24 @@ return [
 
     'connections' => [
 
+        /*
+        |--------------------------------------------------------------------------
+        | Sms EG Connection
+        |--------------------------------------------------------------------------
+        |
+        | Here are credentials for sms eg company. Of course There are
+        | two types of service you can choose one of:
+        | normal => using message service
+        | otp => using otp service
+        |
+        */
+
         'smseg' => [
             'driver'    => 'smseg',
             'username'  => env('SMS_USERNAME'),
             'password'  => env('SMS_PASSWORD'),
             'sender_id' => env('SMS_SENDER_ID'),
+            'service'   => env('SMS_SERVICE', 'normal'),
         ],
     ],
 
