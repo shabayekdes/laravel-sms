@@ -47,6 +47,40 @@ return [
             'sender_id' => env('SMS_SENDER_ID'),
             'service'   => env('SMS_SERVICE', 'normal'),
         ],
+
+        /*
+        |--------------------------------------------------------------------------
+        | Sms EG Connection
+        |--------------------------------------------------------------------------
+        |
+        | Here are credentials for sms eg company. Of course There are
+        | two types of service you can choose one of:
+        | normal => using message service
+        | otp => using otp service
+        |
+        */
+
+        'smsmisr' => [
+            'driver'    => 'smsmisr',
+            'username'  => env('SMS_USERNAME'),
+            'password'  => env('SMS_PASSWORD'),
+            'sender_id' => env('SMS_SENDER_ID'),
+            'service'   => env('SMS_SERVICE', 'normal'),
+            'token' => env('SMS_TOKEN'),
+            'msignature' => env('SMS_MSIGNATURE'),
+            'sms_id' => env('SMS_SMS_ID'),
+        ],
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | SMS Message Locale Configuration
+    |--------------------------------------------------------------------------
+    |
+    | The sms message locale determines the default locale that will be used
+    |
+    */
+
+    'language' => env('SMS_LANGUAGE', 'ar'),
 
 ];
