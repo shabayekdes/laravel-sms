@@ -2,16 +2,13 @@
 
 namespace Shabayek\Sms\Tests\Feature;
 
-use Shabayek\Sms\Facade\Sms;
-use InvalidArgumentException;
-use Shabayek\Sms\Drivers\SmsEg;
-use Shabayek\Sms\Tests\TestCase;
-use Shabayek\Sms\Drivers\SmsMisr;
-use Shabayek\Sms\Drivers\SmsNull;
 use Illuminate\Support\Facades\Http;
+use Shabayek\Sms\Facade\Sms;
+use Shabayek\Sms\Tests\TestCase;
 
 /**
  * SmsEgFeatureTest class.
+ *
  * @author Esmail Shabayek <esmail.shabayek@gmail.com>
  */
 class SmsEgFeatureTest extends TestCase
@@ -22,7 +19,7 @@ class SmsEgFeatureTest extends TestCase
         $this->setConfig('smseg');
 
         Http::fake([
-            "https://smssmartegypt.com/sms/api" => Http::response(
+            'https://smssmartegypt.com/sms/api' => Http::response(
                 [
                     'type' => 'success',
                 ], 200),
@@ -33,13 +30,14 @@ class SmsEgFeatureTest extends TestCase
         $this->assertTrue($sms['success']);
         $this->assertEquals('Message sent successfully', $sms['message']);
     }
+
     /** @test */
     public function test_smseg_not_sent_message()
     {
         $this->setConfig('smseg');
 
         Http::fake([
-            "https://smssmartegypt.com/sms/api" => Http::response(
+            'https://smssmartegypt.com/sms/api' => Http::response(
                 [
                     'type' => 'error',
                 ], 200),
@@ -50,10 +48,11 @@ class SmsEgFeatureTest extends TestCase
         $this->assertFalse($sms['success']);
         $this->assertEquals('Message not sent successfully', $sms['message']);
     }
+
     /**
      * Set config.
      *
-     * @param string $config
+     * @param  string  $config
      * @return void
      */
     private function setConfig(string $config)
