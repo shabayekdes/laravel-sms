@@ -2,23 +2,55 @@
 
 namespace Shabayek\Sms\Drivers;
 
-use Exception;
 use Illuminate\Support\Facades\Http;
 use Shabayek\Sms\Contracts\SmsGatewayContract;
+use Shabayek\Sms\Enums\Service;
 
-class SmsMisr implements SmsGatewayContract
+class SmsMisr extends Driver implements SmsGatewayContract
 {
-    const SMS_NORMAL_SERVICE = 'normal';
-    const SMS_OTP_SERVICE = 'otp';
+    protected $base_url = 'https://smsmisr.com/api';
 
-    private $base_url = 'https://smsmisr.com/api';
+    /**
+     * Username.
+     *
+     * @var string
+     */
     private $username;
+    /**
+     * Password.
+     *
+     * @var string
+     */
     private $password;
+    /**
+     * Sender ID.
+     *
+     * @var string
+     */
     private $sender_id;
-
+    /**
+     * Msignature.
+     *
+     * @var string
+     */
     private $msignature;
+    /**
+     * Sms ID.
+     *
+     * @var string
+     */
     private $sms_id;
+    /**
+     * Token.
+     *
+     * @var string
+     */
     private $token;
+    /**
+     * Language.
+     *
+     * @var string
+     */
     private $language;
 
     /**
@@ -76,11 +108,11 @@ class SmsMisr implements SmsGatewayContract
     {
         $code = $this->generateCode();
 
-        if ($this->service == self::SMS_OTP_SERVICE) {
+        if ($this->service == Service::SMS_OTP_SERVICE) {
             $this->sendOtpRequest($phone, $code);
         }
 
-        if ($this->service == self::SMS_NORMAL_SERVICE) {
+        if ($this->service == Service::SMS_NORMAL_SERVICE) {
             if (is_null($message)) {
                 $message = 'Your verification code is: '.$code;
             }
@@ -88,18 +120,6 @@ class SmsMisr implements SmsGatewayContract
         }
 
         return $code;
-    }
-
-    /**
-     * Verify phone number.
-     *
-     * @param  string|int  $phone
-     * @param  string  $otp
-     * @return bool
-     */
-    public function verify($phone, $otp): bool
-    {
-        throw new Exception('This service is not supported');
     }
 
     /**
@@ -169,22 +189,6 @@ class SmsMisr implements SmsGatewayContract
         $response = Http::post($this->base_url.'/v2', $params);
 
         return $response->json();
-    }
-
-    /**
-     * Generate otp code.
-     *
-     * @return int
-     */
-    private function generateCode()
-    {
-        if (app()->environment('production')) {
-            $code = rand(100000, 999999);
-        } else {
-            $code = 1234;
-        }
-
-        return $code;
     }
 
     /**

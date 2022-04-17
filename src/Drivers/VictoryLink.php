@@ -2,7 +2,6 @@
 
 namespace Shabayek\Sms\Drivers;
 
-use Exception;
 use Illuminate\Support\Facades\Http;
 use Shabayek\Sms\Contracts\SmsGatewayContract;
 
@@ -11,12 +10,28 @@ use Shabayek\Sms\Contracts\SmsGatewayContract;
  *
  * @author Esmail Shabayek <esmail.shabayek@gmail.com>
  */
-class VictoryLink implements SmsGatewayContract
+class VictoryLink extends Driver implements SmsGatewayContract
 {
     protected $base_url = 'https://smsvas.vlserv.com/KannelSending/service.asmx';
-    protected $username;
-    protected $password;
-    protected $sender_id;
+
+    /**
+     * Username.
+     *
+     * @var string
+     */
+    private $username;
+    /**
+     * Password.
+     *
+     * @var string
+     */
+    private $password;
+    /**
+     * Sender ID.
+     *
+     * @var string
+     */
+    private $sender_id;
 
     /**
      * VictoryLink Constructor.
@@ -72,18 +87,6 @@ class VictoryLink implements SmsGatewayContract
     }
 
     /**
-     * Verify phone number.
-     *
-     * @param  string|int  $phone
-     * @param  string  $otp
-     * @return bool
-     */
-    public function verify($phone, $otp): bool
-    {
-        throw new Exception('This service is not supported');
-    }
-
-    /**
      * Get balance.
      *
      * @return int
@@ -126,22 +129,6 @@ class VictoryLink implements SmsGatewayContract
         $xml = simplexml_load_string($response->body());
 
         return json_decode(json_encode((array) $xml), true);
-    }
-
-    /**
-     * Generate otp code.
-     *
-     * @return int
-     */
-    private function generateCode()
-    {
-        if (app()->environment('production')) {
-            $code = rand(100000, 999999);
-        } else {
-            $code = 1234;
-        }
-
-        return $code;
     }
 
     /**

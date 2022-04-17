@@ -9,7 +9,7 @@ use Shabayek\Sms\Contracts\SmsGatewayContract;
  *
  * @author Esmail Shabayek <esmail.shabayek@gmail.com>
  */
-class SmsNull implements SmsGatewayContract
+class SmsNull extends Driver implements SmsGatewayContract
 {
     /**
      * Send sms message.
@@ -36,18 +36,6 @@ class SmsNull implements SmsGatewayContract
     public function sendOtp($phone, $message = null)
     {
         return null;
-    }
-
-    /**
-     * Verify phone number.
-     *
-     * @param  string|int  $phone
-     * @param  string  $otp
-     * @return bool
-     */
-    public function verify($phone, $otp): bool
-    {
-        return true;
     }
 
     /**
