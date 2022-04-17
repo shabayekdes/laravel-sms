@@ -2,7 +2,7 @@
 
 namespace Shabayek\Sms\Drivers;
 
-use Exception;
+use Shabayek\Sms\Enums\Service;
 use Illuminate\Support\Facades\Http;
 use Shabayek\Sms\Contracts\SmsGatewayContract;
 
@@ -13,13 +13,26 @@ use Shabayek\Sms\Contracts\SmsGatewayContract;
  */
 class SmsEg extends Driver implements SmsGatewayContract
 {
-    const SMS_NORMAL_SERVICE = 'normal';
-    const SMS_OTP_SERVICE = 'otp';
+    /**
+     * Base url.
+     * @var string
+     */
+    protected $base_url = 'https://smssmartegypt.com/sms/api';
 
-    private $base_url = 'https://smssmartegypt.com/sms/api';
-    private $service;
+    /**
+     * Username.
+     * @var string
+     */
     private $username;
+    /**
+     * Password.
+     * @var string
+     */
     private $password;
+    /**
+     * Sender ID.
+     * @var string
+     */
     private $sender_id;
 
     /**
@@ -71,11 +84,11 @@ class SmsEg extends Driver implements SmsGatewayContract
     {
         $code = null;
 
-        if ($this->service == self::SMS_OTP_SERVICE) {
+        if ($this->service == Service::SMS_OTP_SERVICE) {
             $this->sendOtpRequest($phone);
         }
 
-        if ($this->service == self::SMS_NORMAL_SERVICE) {
+        if ($this->service == Service::SMS_NORMAL_SERVICE) {
             $code = $this->generateCode();
             if (is_null($message)) {
                 $message = 'Your verification code is: '.$code;
@@ -87,18 +100,19 @@ class SmsEg extends Driver implements SmsGatewayContract
     }
 
     /**
-     * Verify phone number.
+     * Verify phone number
      *
-     * @param  string|int  $phone
-     * @param  string  $otp
+     * @param string $phone
+     * @param int $otp
+     * @param int|null $actualOtp
      * @return bool
      */
-    public function verify($phone, $otp): bool
+    public function verify(string $phone, $otp, $actualOtp = null): bool
     {
-        if ($this->service == self::SMS_OTP_SERVICE) {
+        if ($this->service == Service::SMS_OTP_SERVICE) {
             return $this->verifyOtpRequest($phone, $otp);
         }
-        throw new Exception('This service is not supported');
+        return parent::verify($phone, $otp, $actualOtp);
     }
 
     /**

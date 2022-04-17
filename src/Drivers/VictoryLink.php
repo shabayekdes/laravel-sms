@@ -14,9 +14,22 @@ use Shabayek\Sms\Contracts\SmsGatewayContract;
 class VictoryLink extends Driver implements SmsGatewayContract
 {
     protected $base_url = 'https://smsvas.vlserv.com/KannelSending/service.asmx';
-    protected $username;
-    protected $password;
-    protected $sender_id;
+
+    /**
+     * Username.
+     * @var string
+     */
+    private $username;
+    /**
+     * Password.
+     * @var string
+     */
+    private $password;
+    /**
+     * Sender ID.
+     * @var string
+     */
+    private $sender_id;
 
     /**
      * VictoryLink Constructor.
@@ -69,18 +82,6 @@ class VictoryLink extends Driver implements SmsGatewayContract
         $this->send($phone, $message);
 
         return $code;
-    }
-
-    /**
-     * Verify phone number.
-     *
-     * @param  string|int  $phone
-     * @param  string  $otp
-     * @return bool
-     */
-    public function verify($phone, $otp): bool
-    {
-        throw new Exception('This service is not supported');
     }
 
     /**

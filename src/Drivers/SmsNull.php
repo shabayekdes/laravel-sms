@@ -39,18 +39,6 @@ class SmsNull extends Driver implements SmsGatewayContract
     }
 
     /**
-     * Verify phone number.
-     *
-     * @param  string|int  $phone
-     * @param  string  $otp
-     * @return bool
-     */
-    public function verify($phone, $otp): bool
-    {
-        return true;
-    }
-
-    /**
      * Get balance.
      *
      * @return int
