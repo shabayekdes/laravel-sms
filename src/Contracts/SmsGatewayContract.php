@@ -30,10 +30,11 @@ interface SmsGatewayContract
     /**
      * Verify phone number.
      *
-     * @param string $phone
-     * @param int $otp
-     * @param int|null $actualOtp
+     * @param  string  $phone
+     * @param  int  $otp
+     * @param  int|null  $actualOtp
      * @return bool
+     *
      * @throws Exception
      */
     public function verify(string $phone, int $otp, $actualOtp = null): bool;

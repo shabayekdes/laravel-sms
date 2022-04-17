@@ -2,7 +2,6 @@
 
 namespace Shabayek\Sms\Drivers;
 
-use Exception;
 use Illuminate\Support\Facades\Http;
 use Shabayek\Sms\Contracts\SmsGatewayContract;
 
@@ -17,16 +16,19 @@ class VictoryLink extends Driver implements SmsGatewayContract
 
     /**
      * Username.
+     *
      * @var string
      */
     private $username;
     /**
      * Password.
+     *
      * @var string
      */
     private $password;
     /**
      * Sender ID.
+     *
      * @var string
      */
     private $sender_id;
