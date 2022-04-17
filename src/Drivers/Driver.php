@@ -5,7 +5,7 @@ namespace Shabayek\Sms\Drivers;
 use Exception;
 
 /**
- * Driver class
+ * Driver class.
  *
  * @author Esmail Shabayek <esmail.shabayek@gmail.com>
  */
