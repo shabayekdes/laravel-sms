@@ -9,7 +9,7 @@ use Shabayek\Sms\Contracts\SmsGatewayContract;
  *
  * @author Esmail Shabayek <esmail.shabayek@gmail.com>
  */
-class SmsNull implements SmsGatewayContract
+class SmsNull extends Driver implements SmsGatewayContract
 {
     /**
      * Send sms message.

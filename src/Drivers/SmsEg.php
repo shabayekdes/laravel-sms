@@ -11,7 +11,7 @@ use Shabayek\Sms\Contracts\SmsGatewayContract;
  *
  * @author Esmail Shabayek <esmail.shabayek@gmail.com>
  */
-class SmsEg implements SmsGatewayContract
+class SmsEg extends Driver implements SmsGatewayContract
 {
     const SMS_NORMAL_SERVICE = 'normal';
     const SMS_OTP_SERVICE = 'otp';
@@ -186,21 +186,5 @@ class SmsEg implements SmsGatewayContract
         }
 
         return false;
-    }
-
-    /**
-     * Generate otp code.
-     *
-     * @return int
-     */
-    private function generateCode()
-    {
-        if (app()->environment('production')) {
-            $code = rand(100000, 999999);
-        } else {
-            $code = 1234;
-        }
-
-        return $code;
     }
 }

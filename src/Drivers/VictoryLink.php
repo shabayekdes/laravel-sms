@@ -11,7 +11,7 @@ use Shabayek\Sms\Contracts\SmsGatewayContract;
  *
  * @author Esmail Shabayek <esmail.shabayek@gmail.com>
  */
-class VictoryLink implements SmsGatewayContract
+class VictoryLink extends Driver implements SmsGatewayContract
 {
     protected $base_url = 'https://smsvas.vlserv.com/KannelSending/service.asmx';
     protected $username;
@@ -126,22 +126,6 @@ class VictoryLink implements SmsGatewayContract
         $xml = simplexml_load_string($response->body());
 
         return json_decode(json_encode((array) $xml), true);
-    }
-
-    /**
-     * Generate otp code.
-     *
-     * @return int
-     */
-    private function generateCode()
-    {
-        if (app()->environment('production')) {
-            $code = rand(100000, 999999);
-        } else {
-            $code = 1234;
-        }
-
-        return $code;
     }
 
     /**
