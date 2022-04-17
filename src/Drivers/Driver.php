@@ -3,7 +3,7 @@
 namespace Shabayek\Sms\Drivers;
 
 /**
- * Driver class
+ * Driver class.
  *
  * @author Esmail Shabayek <esmail.shabayek@gmail.com>
  */
