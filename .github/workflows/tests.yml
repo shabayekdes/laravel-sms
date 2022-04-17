@@ -11,30 +11,53 @@ on:
 
 jobs:
   tests:
-    runs-on: ubuntu-20.04
+    runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: true
       matrix:
-        php: [7.3, 7.4, 8.0]
+        os: [ 'ubuntu-latest' ]
+        php-versions: [7.3, 7.4, 8.0]
+        phpunit-version: [ '9.5' ]
 
-    name: PHP ${{ matrix.php }}
+    name: PHP ${{ matrix.php-versions }} Test on ${{ matrix.os }}
 
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v2
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php }}
+          php-version: ${{ matrix.php-versions }}
           extensions: dom, curl, libxml, mbstring, zip
-          tools: composer:v2
-          coverage: none
+          tools: phpunit:${{ matrix.phpunit-version }}, composer:v2
+          coverage: xdebug
 
-      - name: Install dependencies
+      - name: Check PHP Version
+        run: php -v
+
+      - name: Check Composer Version
+        run: composer -V
+
+      - name: Validate Composer json/lock
+        run: composer validate --strict
+
+      - name: Get Composer Cache Directory
+        id: composer-cache
         run: |
-           composer update --prefer-dist --no-interaction --no-progress
+          echo "::set-output name=dir::$(composer config cache-files-dir)"
 
-      - name: Execute tests
-        run: vendor/bin/phpunit --verbose
+      - name: Cache Composer dependencies
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install Composer Dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress --no-suggest
+
+      - name: Run Unit Test
+        run: composer test
