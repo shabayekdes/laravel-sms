@@ -124,7 +124,7 @@ class VictoryLink extends Driver implements SmsGatewayContract
             'SMSText' => $message,
         ];
 
-        $response = Http::get($this->base_url . '/SendSMS?'.http_build_query($params));
+        $response = Http::get($this->base_url.'/SendSMS?'.http_build_query($params));
 
         $xml = simplexml_load_string($response->body());
 

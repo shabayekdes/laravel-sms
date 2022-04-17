@@ -63,7 +63,7 @@ class Ooredoo extends Driver implements SmsGatewayContract
 
         return [
             'success' => $success,
-            'message' => $success ? 'Message sent successfully' : 'Message not sent successfully'
+            'message' => $success ? 'Message sent successfully' : 'Message not sent successfully',
         ];
     }
 
@@ -95,15 +95,15 @@ class Ooredoo extends Driver implements SmsGatewayContract
     public function balance()
     {
         $params = [
-            "customerID" => $this->customer_id,
-            "userName" => $this->username,
-            "userPassword" => $this->password,
+            'customerID' => $this->customer_id,
+            'userName' => $this->username,
+            'userPassword' => $this->password,
         ];
 
-        $response = Http::get($this->base_url . '/HTTP_Authenticate2?'.http_build_query($params));
+        $response = Http::get($this->base_url.'/HTTP_Authenticate2?'.http_build_query($params));
 
         $response = simplexml_load_string($response->body());
-        $arr = json_decode(json_encode((array)$response), true);
+        $arr = json_decode(json_encode((array) $response), true);
 
         $filtered = collect($arr['Credits']['CreditPair'])->filter(function ($item) {
             return $item['Type'] == 'SMS';
@@ -135,7 +135,7 @@ class Ooredoo extends Driver implements SmsGatewayContract
             'Private' => false,
         ];
 
-        $response = Http::get($this->base_url . '/HTTP_SendSms?'.http_build_query($params));
+        $response = Http::get($this->base_url.'/HTTP_SendSms?'.http_build_query($params));
 
         $xml = simplexml_load_string($response->body());
 
