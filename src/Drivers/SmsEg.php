@@ -2,9 +2,9 @@
 
 namespace Shabayek\Sms\Drivers;
 
-use Shabayek\Sms\Enums\Service;
 use Illuminate\Support\Facades\Http;
 use Shabayek\Sms\Contracts\SmsGatewayContract;
+use Shabayek\Sms\Enums\Service;
 
 /**
  * SmsEg class.
@@ -15,22 +15,26 @@ class SmsEg extends Driver implements SmsGatewayContract
 {
     /**
      * Base url.
+     *
      * @var string
      */
     protected $base_url = 'https://smssmartegypt.com/sms/api';
 
     /**
      * Username.
+     *
      * @var string
      */
     private $username;
     /**
      * Password.
+     *
      * @var string
      */
     private $password;
     /**
      * Sender ID.
+     *
      * @var string
      */
     private $sender_id;
@@ -100,11 +104,11 @@ class SmsEg extends Driver implements SmsGatewayContract
     }
 
     /**
-     * Verify phone number
+     * Verify phone number.
      *
-     * @param string $phone
-     * @param int $otp
-     * @param int|null $actualOtp
+     * @param  string  $phone
+     * @param  int  $otp
+     * @param  int|null  $actualOtp
      * @return bool
      */
     public function verify(string $phone, $otp, $actualOtp = null): bool
@@ -112,6 +116,7 @@ class SmsEg extends Driver implements SmsGatewayContract
         if ($this->service == Service::SMS_OTP_SERVICE) {
             return $this->verifyOtpRequest($phone, $otp);
         }
+
         return parent::verify($phone, $otp, $actualOtp);
     }
 

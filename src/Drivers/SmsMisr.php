@@ -2,9 +2,9 @@
 
 namespace Shabayek\Sms\Drivers;
 
-use Shabayek\Sms\Enums\Service;
 use Illuminate\Support\Facades\Http;
 use Shabayek\Sms\Contracts\SmsGatewayContract;
+use Shabayek\Sms\Enums\Service;
 
 class SmsMisr extends Driver implements SmsGatewayContract
 {
@@ -12,36 +12,43 @@ class SmsMisr extends Driver implements SmsGatewayContract
 
     /**
      * Username.
+     *
      * @var string
      */
     private $username;
     /**
      * Password.
+     *
      * @var string
      */
     private $password;
     /**
      * Sender ID.
+     *
      * @var string
      */
     private $sender_id;
     /**
      * Msignature.
+     *
      * @var string
      */
     private $msignature;
     /**
      * Sms ID.
+     *
      * @var string
      */
     private $sms_id;
     /**
      * Token.
+     *
      * @var string
      */
     private $token;
     /**
      * Language.
+     *
      * @var string
      */
     private $language;
