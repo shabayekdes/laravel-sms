@@ -6,13 +6,13 @@ use Illuminate\Support\Facades\Http;
 use Shabayek\Sms\Contracts\SmsGatewayContract;
 
 /**
- * VictoryLink class.
+ * Ooredoo class.
  *
  * @author Esmail Shabayek <esmail.shabayek@gmail.com>
  */
-class VictoryLink extends Driver implements SmsGatewayContract
+class Ooredoo extends Driver implements SmsGatewayContract
 {
-    protected $base_url = 'https://smsvas.vlserv.com/KannelSending/service.asmx';
+    protected $base_url = 'https://messaging.ooredoo.qa/bms/soap/Messenger.asmx';
 
     /**
      * Username.
@@ -41,9 +41,11 @@ class VictoryLink extends Driver implements SmsGatewayContract
      */
     public function __construct(array $config)
     {
+        $this->base_url = $config['base_url'];
         $this->username = $config['username'];
         $this->password = $config['password'];
         $this->sender_id = $config['sender_id'];
+        $this->customer_id = $config['customer_id'];
     }
 
     /**
@@ -57,12 +59,11 @@ class VictoryLink extends Driver implements SmsGatewayContract
     {
         $response = $this->sendMessageRequest($phone, $message);
 
-        $success = $response[0] === '0';
-        $message = $success ? 'Message sent successfully' : 'Message not sent successfully';
+        $success = isset($response['Result']) && $response['Result'] == 'OK';
 
         return [
             'success' => $success,
-            'message' => $message,
+            'message' => $success ? 'Message sent successfully' : 'Message not sent successfully'
         ];
     }
 
@@ -94,16 +95,21 @@ class VictoryLink extends Driver implements SmsGatewayContract
     public function balance()
     {
         $params = [
-            'UserName' => $this->username,
-            'Password' => $this->password,
+            "customerID" => $this->customer_id,
+            "userName" => $this->username,
+            "userPassword" => $this->password,
         ];
 
-        $response = Http::get($this->base_url.'/CheckCredit?'.http_build_query($params));
+        $response = Http::get($this->base_url . '/HTTP_Authenticate2?'.http_build_query($params));
 
-        $xml = simplexml_load_string($response->body());
-        $result = json_decode(json_encode((array) $xml), true);
+        $response = simplexml_load_string($response->body());
+        $arr = json_decode(json_encode((array)$response), true);
 
-        return $result[0];
+        $filtered = collect($arr['Credits']['CreditPair'])->filter(function ($item) {
+            return $item['Type'] == 'SMS';
+        })->first();
+
+        return abs($filtered['Value'] ?? 0);
     }
 
     /**
@@ -116,15 +122,20 @@ class VictoryLink extends Driver implements SmsGatewayContract
     private function sendMessageRequest($phone, $message)
     {
         $params = [
-            'UserName' => $this->username,
-            'Password' => $this->password,
-            'SMSSender' => $this->sender_id,
-            'SMSLang' => $this->getLanguage(),
-            'SMSReceiver' => $phone,
-            'SMSText' => $message,
+            'userName' => $this->username,
+            'userPassword' => $this->password,
+            'originator' => $this->sender_id,
+            'customerID' => $this->customer_id,
+            'messageType' => $this->getLanguage(),
+            'recipientPhone' => $phone,
+            'smsText' => $message,
+            'defDate' => '',
+            'blink' => false,
+            'flash' => false,
+            'Private' => false,
         ];
 
-        $response = Http::get($this->base_url . '/SendSMS?'.http_build_query($params));
+        $response = Http::get($this->base_url . '/HTTP_SendSms?'.http_build_query($params));
 
         $xml = simplexml_load_string($response->body());
 
@@ -140,13 +151,13 @@ class VictoryLink extends Driver implements SmsGatewayContract
     {
         switch (config('sms.language')) {
             case 'en':
-                $locale = 'E';
+                $locale = 'Latin';
                 break;
             case 'ar':
-                $locale = 'A';
+                $locale = 'ArabicWithArabicNumbers';
                 break;
             default:
-                $locale = 'E';
+                $locale = 'ArabicWithArabicNumbers';
                 break;
         }
 
