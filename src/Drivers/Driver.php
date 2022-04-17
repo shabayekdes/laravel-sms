@@ -12,7 +12,8 @@ use Exception;
 class Driver
 {
     /**
-     * Service of sms gateway
+     * Service of sms gateway.
+     *
      * @var string
      */
     protected $service;
@@ -20,17 +21,19 @@ class Driver
     /**
      * Verify phone number.
      *
-     * @param string $phone
-     * @param int $otp
-     * @param int|null $actualOtp
+     * @param  string  $phone
+     * @param  int  $otp
+     * @param  int|null  $actualOtp
      * @return bool
+     *
      * @throws Exception
      */
     public function verify(string $phone, int $otp, $actualOtp = null): bool
     {
-        if(is_null($actualOtp)) {
+        if (is_null($actualOtp)) {
             throw new \Exception('Actual otp is required for this service');
         }
+
         return $otp == $actualOtp;
     }
 
