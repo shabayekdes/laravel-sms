@@ -8,6 +8,7 @@ This is a Laravel Package for SMS Gateway Integration. Now Sending SMS is easy.
 - [x] [SMS EG](https://www.smseg.com/en)
 - [x] [SMS Misr](https://www.sms.com.eg/website)
 - [x] [Victory Link](http://www.victorylink.com/)
+- [x] [Ooredoo](https://www.ooredoo.com/en/)
 - [ ] ...
 
 
