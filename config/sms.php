@@ -133,6 +133,6 @@ return [
     'message' => [
         'ar' => env('SMS_MESSAGE', 'كود التحقق الخاص بك هو: {code}'),
         'en' => env('SMS_MESSAGE', 'Your verification code is: {code}'),
-    ]
+    ],
 
 ];

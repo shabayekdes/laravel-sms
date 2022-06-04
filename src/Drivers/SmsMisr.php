@@ -29,7 +29,6 @@ class SmsMisr extends Driver implements SmsGatewayContract
      */
     private $token;
 
-
     /**
      * SmsMisr Constructor.
      *
