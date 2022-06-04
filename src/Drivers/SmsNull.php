@@ -21,6 +21,7 @@ class SmsNull extends Driver implements SmsGatewayContract
     {
         $this->config = $config;
     }
+
     /**
      * Send sms message.
      *

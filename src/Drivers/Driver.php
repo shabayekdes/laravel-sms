@@ -43,6 +43,7 @@ abstract class Driver
      * @var string
      */
     protected $service = Service::SMS_NORMAL_SERVICE;
+
     /**
      * Driver Constructor.
      *
