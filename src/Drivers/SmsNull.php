@@ -12,6 +12,16 @@ use Shabayek\Sms\Contracts\SmsGatewayContract;
 class SmsNull extends Driver implements SmsGatewayContract
 {
     /**
+     * SmsNull Constructor.
+     *
+     * @param  array  $config
+     * @return void
+     */
+    public function __construct(array $config)
+    {
+        $this->config = $config;
+    }
+    /**
      * Send sms message.
      *
      * @param  string  $phone
