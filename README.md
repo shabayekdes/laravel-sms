@@ -74,6 +74,50 @@ $actualOtp = '123456'; // this is the actual otp that you sent to the user
 $verify = Sms::verify($phone, $otp, $actualOtp); // third params is optional with service otp
 ```
 
+### Adding Custom Cache Drivers
+
+To create our custom sms driver, we first need to implement the Shabayek\Sms\Contracts\SmsGatewayContract contract. So, a new SMS gateway implementation might look something like this:
+
+```php
+namespace Shabayek\Sms\Contracts;
+
+class CustomSms implements SmsGatewayContract
+{
+    public function send($phone, $message): array;
+
+    public function sendOtp($phone, $message = null);
+
+    public function verify(string $phone, int $otp, $actualOtp = null): bool;
+
+    public function balance() { }
+}
+```
+
+Then, we need to add a new config for our custom sms driver. in sms config within **connections** key
+
+```php
+'connections' => [
+    ...
+    'custom' => [
+        'driver' => 'custom',
+        'username' => 'username',
+        'password' => 'password',
+        'sender_id' => 'sender',
+        'service' => 'normal',
+    ],
+    ...
+],
+
+```
+
+we can finish our custom driver registration by calling the Sms facade's extend method:
+
+```php
+Sms::extend('custom', function ($app) {
+    return new CustomSms(config());
+});
+```
+
 
 ### Testing
 
