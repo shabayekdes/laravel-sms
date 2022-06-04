@@ -54,7 +54,6 @@ class SmsManager extends Manager
         if (isset($this->customCreators[$driver])) {
             return $this->callCustomCreator($driver);
         } else {
-
             $method = 'create'.Str::studly($config['driver']).'Driver';
 
             if (method_exists($this, $method)) {
