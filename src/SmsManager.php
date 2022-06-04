@@ -51,12 +51,16 @@ class SmsManager extends Manager
             throw new InvalidArgumentException("Cache store [{$driver}] is not defined.");
         }
 
-        $method = 'create'.Str::studly($config['driver']).'Driver';
+        if (isset($this->customCreators[$driver])) {
+            return $this->callCustomCreator($driver);
+        } else {
 
-        if (method_exists($this, $method)) {
-            return $this->$method($config);
+            $method = 'create'.Str::studly($config['driver']).'Driver';
+
+            if (method_exists($this, $method)) {
+                return $this->$method($config);
+            }
         }
-
         throw new InvalidArgumentException("Driver [$driver] not supported.");
     }
 
