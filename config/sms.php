@@ -118,4 +118,21 @@ return [
 
     'language' => env('SMS_LANGUAGE', 'ar'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | SMS Custom Message For Otp Service
+    |--------------------------------------------------------------------------
+    |
+    | The sms custom message that will be used it will be replaced with
+    | the default message "Your verification code is: {code}"
+    | put your custom message here and use the keyword
+    | {code} to replace it with the verification code
+    |
+    */
+
+    'message' => [
+        'ar' => env('SMS_MESSAGE', 'كود التحقق الخاص بك هو: {code}'),
+        'en' => env('SMS_MESSAGE', 'Your verification code is: {code}'),
+    ]
+
 ];

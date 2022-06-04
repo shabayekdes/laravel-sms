@@ -22,10 +22,9 @@ interface SmsGatewayContract
      * send otp verification.
      *
      * @param  string  $phone
-     * @param  string|null  $message
      * @return int|null
      */
-    public function sendOtp($phone, $message = null);
+    public function sendOtp($phone);
 
     /**
      * Verify phone number.

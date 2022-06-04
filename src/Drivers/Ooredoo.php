@@ -15,25 +15,6 @@ class Ooredoo extends Driver implements SmsGatewayContract
     protected $base_url = 'https://messaging.ooredoo.qa/bms/soap/Messenger.asmx';
 
     /**
-     * Username.
-     *
-     * @var string
-     */
-    private $username;
-    /**
-     * Password.
-     *
-     * @var string
-     */
-    private $password;
-    /**
-     * Sender ID.
-     *
-     * @var string
-     */
-    private $sender_id;
-
-    /**
      * VictoryLink Constructor.
      *
      * @param  array  $config
@@ -42,10 +23,9 @@ class Ooredoo extends Driver implements SmsGatewayContract
     public function __construct(array $config)
     {
         $this->base_url = $config['base_url'];
-        $this->username = $config['username'];
-        $this->password = $config['password'];
-        $this->sender_id = $config['sender_id'];
         $this->customer_id = $config['customer_id'];
+
+        parent::__construct($config['username'], $config['password'], $config['sender_id']);
     }
 
     /**
@@ -71,17 +51,13 @@ class Ooredoo extends Driver implements SmsGatewayContract
      * send otp verification.
      *
      * @param  string|int  $phone
-     * @param  string|null  $message
      * @return int|null
      */
-    public function sendOtp($phone, $message = null)
+    public function sendOtp($phone)
     {
-        $code = null;
-
         $code = $this->generateCode();
-        if (is_null($message)) {
-            $message = 'Your verification code is: '.$code;
-        }
+        $message = $this->getMessage($code);
+
         $this->send($phone, $message);
 
         return $code;
@@ -149,7 +125,7 @@ class Ooredoo extends Driver implements SmsGatewayContract
      */
     private function getLanguage()
     {
-        switch (config('sms.language')) {
+        switch ($this->language) {
             case 'en':
                 $locale = 'Latin';
                 break;

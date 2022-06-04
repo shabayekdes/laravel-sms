@@ -30,10 +30,9 @@ class SmsNull extends Driver implements SmsGatewayContract
      * send otp verification.
      *
      * @param  string  $phone
-     * @param  string|null  $message
      * @return int|null
      */
-    public function sendOtp($phone, $message = null)
+    public function sendOtp($phone)
     {
         return null;
     }
