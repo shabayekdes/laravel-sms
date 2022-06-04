@@ -32,7 +32,7 @@ abstract class Driver
      */
     protected $sender_id;
     /**
-     * Language
+     * Language.
      *
      * @var string
      */
@@ -98,17 +98,20 @@ abstract class Driver
     protected function getMessage($code): string
     {
         $message = config("sms.message.{$this->language}", 'Your verification code is: {code}');
+
         return Str::replace('{code}', $code, $message);
     }
-	/**
-	 * Language
-	 *
-	 * @param string $language Language
-	 * @return self
-	 */
-	public function setLanguage($language): self
+
+    /**
+     * Language.
+     *
+     * @param  string  $language  Language
+     * @return self
+     */
+    public function setLanguage($language): self
     {
-		$this->language = $language;
-		return $this;
-	}
+        $this->language = $language;
+
+        return $this;
+    }
 }
