@@ -12,6 +12,17 @@ use Shabayek\Sms\Contracts\SmsGatewayContract;
 class SmsNull extends Driver implements SmsGatewayContract
 {
     /**
+     * SmsNull Constructor.
+     *
+     * @param  array  $config
+     * @return void
+     */
+    public function __construct(array $config)
+    {
+        $this->config = $config;
+    }
+
+    /**
      * Send sms message.
      *
      * @param  string  $phone
@@ -30,10 +41,9 @@ class SmsNull extends Driver implements SmsGatewayContract
      * send otp verification.
      *
      * @param  string  $phone
-     * @param  string|null  $message
      * @return int|null
      */
-    public function sendOtp($phone, $message = null)
+    public function sendOtp($phone)
     {
         return null;
     }

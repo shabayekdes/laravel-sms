@@ -21,25 +21,6 @@ class SmsEg extends Driver implements SmsGatewayContract
     protected $base_url = 'https://smssmartegypt.com/sms/api';
 
     /**
-     * Username.
-     *
-     * @var string
-     */
-    private $username;
-    /**
-     * Password.
-     *
-     * @var string
-     */
-    private $password;
-    /**
-     * Sender ID.
-     *
-     * @var string
-     */
-    private $sender_id;
-
-    /**
      * SmsEg Constructor.
      *
      * @param  array  $config
@@ -48,9 +29,8 @@ class SmsEg extends Driver implements SmsGatewayContract
     public function __construct(array $config)
     {
         $this->service = $config['service'];
-        $this->username = $config['username'];
-        $this->password = $config['password'];
-        $this->sender_id = $config['sender_id'];
+
+        parent::__construct($config['username'], $config['password'], $config['sender_id']);
     }
 
     /**
@@ -81,10 +61,9 @@ class SmsEg extends Driver implements SmsGatewayContract
      * send otp verification.
      *
      * @param  string|int  $phone
-     * @param  string|null  $message
      * @return int|null
      */
-    public function sendOtp($phone, $message = null)
+    public function sendOtp($phone)
     {
         $code = null;
 
@@ -94,9 +73,7 @@ class SmsEg extends Driver implements SmsGatewayContract
 
         if ($this->service == Service::SMS_NORMAL_SERVICE) {
             $code = $this->generateCode();
-            if (is_null($message)) {
-                $message = 'Your verification code is: '.$code;
-            }
+            $message = $this->getMessage($code);
             $this->send($phone, $message);
         }
 

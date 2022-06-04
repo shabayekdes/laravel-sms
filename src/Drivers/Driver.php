@@ -3,20 +3,63 @@
 namespace Shabayek\Sms\Drivers;
 
 use Exception;
+use Illuminate\Support\Str;
+use Shabayek\Sms\Enums\Service;
 
 /**
  * Driver class.
  *
  * @author Esmail Shabayek <esmail.shabayek@gmail.com>
  */
-class Driver
+abstract class Driver
 {
+    /**
+     * Username.
+     *
+     * @var string
+     */
+    protected $username;
+    /**
+     * Password.
+     *
+     * @var string
+     */
+    protected $password;
+    /**
+     * Sender ID.
+     *
+     * @var string
+     */
+    protected $sender_id;
+    /**
+     * Language.
+     *
+     * @var string
+     */
+    protected $language;
     /**
      * Service of sms gateway.
      *
      * @var string
      */
-    protected $service;
+    protected $service = Service::SMS_NORMAL_SERVICE;
+
+    /**
+     * Driver Constructor.
+     *
+     * @param  string  $username
+     * @param  string  $password
+     * @param  string  $sender_id
+     * @return void
+     */
+    public function __construct($username, $password, $sender_id)
+    {
+        $this->username = $username;
+        $this->password = $password;
+        $this->sender_id = $sender_id;
+
+        $this->language = config('sms.language');
+    }
 
     /**
      * Verify phone number.
@@ -51,5 +94,32 @@ class Driver
         }
 
         return $code;
+    }
+
+    /**
+     * Send sms message.
+     *
+     * @param  string  $phone
+     * @param  string  $message
+     * @return array
+     */
+    protected function getMessage($code): string
+    {
+        $message = config("sms.message.{$this->language}", 'Your verification code is: {code}');
+
+        return Str::replace('{code}', $code, $message);
+    }
+
+    /**
+     * Language.
+     *
+     * @param  string  $language  Language
+     * @return self
+     */
+    public function setLanguage($language): self
+    {
+        $this->language = $language;
+
+        return $this;
     }
 }

@@ -11,24 +11,6 @@ class SmsMisr extends Driver implements SmsGatewayContract
     protected $base_url = 'https://smsmisr.com/api';
 
     /**
-     * Username.
-     *
-     * @var string
-     */
-    private $username;
-    /**
-     * Password.
-     *
-     * @var string
-     */
-    private $password;
-    /**
-     * Sender ID.
-     *
-     * @var string
-     */
-    private $sender_id;
-    /**
      * Msignature.
      *
      * @var string
@@ -46,12 +28,6 @@ class SmsMisr extends Driver implements SmsGatewayContract
      * @var string
      */
     private $token;
-    /**
-     * Language.
-     *
-     * @var string
-     */
-    private $language;
 
     /**
      * SmsMisr Constructor.
@@ -63,14 +39,12 @@ class SmsMisr extends Driver implements SmsGatewayContract
     {
         $this->service = $config['service'];
 
-        $this->username = $config['username'];
-        $this->password = $config['password'];
-        $this->sender_id = $config['sender_id'];
-
         $this->language = $this->getLanguage();
         $this->token = $config['token'];
         $this->msignature = $config['msignature'];
         $this->sms_id = $config['sms_id'];
+
+        parent::__construct($config['username'], $config['password'], $config['sender_id']);
     }
 
     /**
@@ -101,10 +75,9 @@ class SmsMisr extends Driver implements SmsGatewayContract
      * send otp verification.
      *
      * @param  string|int  $phone
-     * @param  string|null  $message
      * @return int|null
      */
-    public function sendOtp($phone, $message = null)
+    public function sendOtp($phone)
     {
         $code = $this->generateCode();
 
@@ -113,9 +86,7 @@ class SmsMisr extends Driver implements SmsGatewayContract
         }
 
         if ($this->service == Service::SMS_NORMAL_SERVICE) {
-            if (is_null($message)) {
-                $message = 'Your verification code is: '.$code;
-            }
+            $message = $this->getMessage($code);
             $this->send($phone, $message);
         }
 
@@ -179,7 +150,7 @@ class SmsMisr extends Driver implements SmsGatewayContract
         $params = [
             'Username' => $this->username,
             'password' => $this->password,
-            'language' => $this->language,
+            'language' => $this->getLanguage(),
             'sender' => $this->sender_id,
             'Mobile' => $phone,
             'message' => $message,
@@ -198,7 +169,7 @@ class SmsMisr extends Driver implements SmsGatewayContract
      */
     private function getLanguage()
     {
-        switch (config('sms.language')) {
+        switch ($this->language) {
             case 'en':
                 $locale = 1;
                 break;

@@ -74,7 +74,20 @@ $actualOtp = '123456'; // this is the actual otp that you sent to the user
 $verify = Sms::verify($phone, $otp, $actualOtp); // third params is optional with service otp
 ```
 
+- You can set language for the OTP sms message.
+
+> en: For English ar: For Arabic
+
+``` php
+use Shabayek\Sms\Facades\Sms;
+
+$sms = Sms::setLanguage('ar');
+        ->sendOtp('0120000000');
+```
+
 ### Adding Custom Cache Drivers
+
+- Writing The Driver
 
 To create our custom sms driver, we first need to implement the Shabayek\Sms\Contracts\SmsGatewayContract contract. So, a new SMS gateway implementation might look something like this:
 
