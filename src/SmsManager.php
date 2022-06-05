@@ -2,12 +2,13 @@
 
 namespace Shabayek\Sms;
 
-use Illuminate\Support\Manager;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use Illuminate\Support\Manager;
 use Shabayek\Sms\Drivers\SmsEg;
 use Shabayek\Sms\Drivers\SmsMisr;
 use Shabayek\Sms\Drivers\SmsNull;
+use Shabayek\Sms\Drivers\Unifonic;
 use Shabayek\Sms\Drivers\VictoryLink;
 
 /**
@@ -109,6 +110,17 @@ class SmsManager extends Manager
     protected function createVictorylinkDriver(array $config): VictoryLink
     {
         return new VictoryLink($config);
+    }
+
+    /**
+     * Create an instance of the sms victory link driver.
+     *
+     * @param  array  $config
+     * @return \Shabayek\Sms\Drivers\Unifonic
+     */
+    protected function createUnifonicDriver(array $config): Unifonic
+    {
+        return new Unifonic($config);
     }
 
     /**

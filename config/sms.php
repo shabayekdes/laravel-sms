@@ -105,6 +105,23 @@ return [
             'customer_id' => env('SMS_CUSTOMER_ID'),
         ],
 
+        /*
+        |--------------------------------------------------------------------------
+        | Unifonic Connection
+        |--------------------------------------------------------------------------
+        |
+        | Here are credentials for Unifonic gateway.
+        |
+        */
+
+        'unifonic' => [
+            'driver'    => 'unifonic',
+            'username'    => env('SMS_USERNAME'),
+            'password'    => env('SMS_PASSWORD'),
+            'apps_id'   => env('SMS_APPS_ID'),
+            'sender_id' => env('SMS_SENDER_ID'),
+        ],
+
     ],
 
     /*
@@ -131,8 +148,8 @@ return [
     */
 
     'message' => [
-        'ar' => env('SMS_MESSAGE', 'كود التحقق الخاص بك هو: {code}'),
-        'en' => env('SMS_MESSAGE', 'Your verification code is: {code}'),
+        'ar' => env('SMS_MESSAGE_AR', 'كود التحقق الخاص بك هو: {code}'),
+        'en' => env('SMS_MESSAGE_EN', 'Your verification code is: {code}'),
     ],
 
 ];
