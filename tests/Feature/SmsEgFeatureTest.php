@@ -30,7 +30,7 @@ class SmsEgFeatureTest extends TestCase
         ];
 
         Http::fake([
-            'https://smssmartegypt.com/sms/api/?'  .  http_build_query($params) => Http::response(
+            'https://smssmartegypt.com/sms/api/?'.http_build_query($params) => Http::response(
                 [
                     'type' => 'success',
                 ], 200),
@@ -59,7 +59,7 @@ class SmsEgFeatureTest extends TestCase
         ];
 
         Http::fake([
-            'https://smssmartegypt.com/sms/api/?'  .  http_build_query($params) => Http::response(
+            'https://smssmartegypt.com/sms/api/?'.http_build_query($params) => Http::response(
                 [
                     'type' => 'error',
                 ], 200),
