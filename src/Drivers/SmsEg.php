@@ -134,7 +134,7 @@ class SmsEg extends Driver implements SmsGatewayContract
             'message' => $message,
         ];
 
-        $response = Http::get($this->base_url . '/?'. http_build_query($params));
+        $response = Http::get($this->base_url.'/?'.http_build_query($params));
 
         return $response->json();
     }
