@@ -18,14 +18,25 @@ class SmsEgFeatureTest extends TestCase
     {
         $this->setConfig('smseg');
 
+        $phone = '0123456789';
+        $message = 'test message';
+
+        $params = [
+            'username' => null,
+            'password' => null,
+            'sendername' => null,
+            'mobiles' => $phone,
+            'message' => $message,
+        ];
+
         Http::fake([
-            'https://smssmartegypt.com/sms/api' => Http::response(
+            'https://smssmartegypt.com/sms/api/?'  .  http_build_query($params) => Http::response(
                 [
                     'type' => 'success',
                 ], 200),
         ]);
 
-        $sms = Sms::send('0123456789', 'test message');
+        $sms = Sms::send($phone, 'test message');
 
         $this->assertTrue($sms['success']);
         $this->assertEquals('Message sent successfully', $sms['message']);
@@ -36,8 +47,19 @@ class SmsEgFeatureTest extends TestCase
     {
         $this->setConfig('smseg');
 
+        $phone = '0123456789';
+        $message = 'test message';
+
+        $params = [
+            'username' => null,
+            'password' => null,
+            'sendername' => null,
+            'mobiles' => $phone,
+            'message' => $message,
+        ];
+
         Http::fake([
-            'https://smssmartegypt.com/sms/api' => Http::response(
+            'https://smssmartegypt.com/sms/api/?'  .  http_build_query($params) => Http::response(
                 [
                     'type' => 'error',
                 ], 200),
