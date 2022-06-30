@@ -83,10 +83,11 @@ class SmsEg extends Driver implements SmsGatewayContract
     /**
      * Verify phone number.
      *
-     * @param string $phone
-     * @param int $otp
-     * @param int|null $actualOtp
+     * @param  string  $phone
+     * @param  int  $otp
+     * @param  int|null  $actualOtp
      * @return bool
+     *
      * @throws \Exception
      */
     public function verify(string $phone, $otp, $actualOtp = null): bool
@@ -109,7 +110,7 @@ class SmsEg extends Driver implements SmsGatewayContract
             'username' => $this->username,
             'password' => $this->password,
         ];
-        $response = Http::get($this->base_url.'/getBalance?' . http_build_query($params));
+        $response = Http::get($this->base_url.'/getBalance?'.http_build_query($params));
         $result = $response->json();
         if (isset($result['type']) && $result['type'] === 'error') {
             return 0;
