@@ -53,8 +53,6 @@ class VictoryLink extends Driver implements SmsGatewayContract
      */
     public function sendOtp($phone)
     {
-        $code = null;
-
         $code = $this->generateCode();
         $message = $this->getMessage($code);
         $this->send($phone, $message);
@@ -67,7 +65,7 @@ class VictoryLink extends Driver implements SmsGatewayContract
      *
      * @return int
      */
-    public function balance()
+    public function balance(): int
     {
         $params = [
             'UserName' => $this->username,
@@ -79,7 +77,7 @@ class VictoryLink extends Driver implements SmsGatewayContract
         $xml = simplexml_load_string($response->body());
         $result = json_decode(json_encode((array) $xml), true);
 
-        return $result[0];
+        return $result[0] ?? 0;
     }
 
     /**

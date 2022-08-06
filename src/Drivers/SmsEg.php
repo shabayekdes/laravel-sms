@@ -2,6 +2,7 @@
 
 namespace Shabayek\Sms\Drivers;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 use Shabayek\Sms\Contracts\SmsGatewayContract;
 use Shabayek\Sms\Enums\Service;
@@ -44,16 +45,16 @@ class SmsEg extends Driver implements SmsGatewayContract
     {
         $response = $this->sendMessageRequest($phone, $message);
         $success = true;
-        $message = 'Message sent successfully';
+        $msg = 'Message sent successfully';
 
         if (isset($response['type']) && $response['type'] === 'error') {
             $success = false;
-            $message = data_get($response, 'error.msg', 'Message not sent successfully');
+            $msg = Arr::get($response, 'error.msg', 'Message not sent successfully');
         }
 
         return [
             'success' => $success,
-            'message' => $message,
+            'message' => $msg,
         ];
     }
 
@@ -111,11 +112,12 @@ class SmsEg extends Driver implements SmsGatewayContract
         ];
         $response = Http::get($this->base_url.'/getBalance?' . http_build_query($params));
         $result = $response->json();
+
         if (isset($result['type']) && $result['type'] === 'error') {
             return 0;
         }
 
-        return $result['data']['points'];
+        return Arr::get($result,'data.points', 0);
     }
 
     /**
