@@ -115,7 +115,7 @@ class SmsMisr extends Driver implements SmsGatewayContract
             return 0;
         }
 
-        return Arr::get($result,'balance', 0);
+        return Arr::get($result, 'balance', 0);
     }
 
     /**

@@ -118,7 +118,7 @@ class SmsEg extends Driver implements SmsGatewayContract
             return 0;
         }
 
-        return Arr::get($result,'data.points', 0);
+        return Arr::get($result, 'data.points', 0);
     }
 
     /**
