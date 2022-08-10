@@ -46,7 +46,7 @@ class SmsEg extends Driver implements SmsGatewayContract
         $success = true;
         $message = 'Message sent successfully';
 
-        if (isset($response['type']) && $response['type'] == 'error') {
+        if (isset($response['type']) && $response['type'] === 'error') {
             $success = false;
             $message = data_get($response, 'error.msg', 'Message not sent successfully');
         }
@@ -87,6 +87,8 @@ class SmsEg extends Driver implements SmsGatewayContract
      * @param  int  $otp
      * @param  int|null  $actualOtp
      * @return bool
+     *
+     * @throws \Exception
      */
     public function verify(string $phone, $otp, $actualOtp = null): bool
     {
@@ -102,15 +104,15 @@ class SmsEg extends Driver implements SmsGatewayContract
      *
      * @return int
      */
-    public function balance()
+    public function balance(): int
     {
         $params = [
             'username' => $this->username,
             'password' => $this->password,
         ];
-        $response = Http::post($this->base_url.'/getBalance', $params);
+        $response = Http::get($this->base_url.'/getBalance?'.http_build_query($params));
         $result = $response->json();
-        if (isset($result['type']) && $result['type'] == 'error') {
+        if (isset($result['type']) && $result['type'] === 'error') {
             return 0;
         }
 
@@ -134,9 +136,7 @@ class SmsEg extends Driver implements SmsGatewayContract
             'message' => $message,
         ];
 
-        $response = Http::get($this->base_url.'/?'.http_build_query($params));
-
-        return $response->json();
+        return Http::get($this->base_url.'/?'.http_build_query($params))->json();
     }
 
     /**
@@ -177,10 +177,6 @@ class SmsEg extends Driver implements SmsGatewayContract
 
         $result = $response->json();
 
-        if (isset($result['type']) && $result['type'] == 'success') {
-            return true;
-        }
-
-        return false;
+        return isset($result['type']) && $result['type'] === 'success';
     }
 }
