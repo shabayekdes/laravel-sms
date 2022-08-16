@@ -91,7 +91,7 @@ class SmsEg extends Driver implements SmsGatewayContract
      *
      * @throws \Exception
      */
-    public function verify(string $phone, $otp, $actualOtp = null): bool
+    public function verify($phone, $otp, $actualOtp = null): bool
     {
         if ($this->service == Service::SMS_OTP_SERVICE) {
             return $this->verifyOtpRequest($phone, $otp);
