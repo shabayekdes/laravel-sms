@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use Psr\Log\LoggerInterface;
 use Shabayek\Sms\DisableLogger;
 use Shabayek\Sms\Enums\Service;
+
 /**
  * Driver class.
  *
@@ -140,7 +141,7 @@ abstract class Driver
         return new DisableLogger();
     }
 
-    protected function log($level, $message, array $context = array())
+    protected function log($level, $message, array $context = [])
     {
         $this->logger->{$level}($message, $context);
     }

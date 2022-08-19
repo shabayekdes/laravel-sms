@@ -125,7 +125,7 @@ class SmsMisr extends Driver implements SmsGatewayContract
         if (isset($response['code']) && $response['code'] == 'Error') {
             return 0;
         }
-        $this->log('debug', "{$this->driver} balance" , $response);
+        $this->log('debug', "{$this->driver} balance", $response);
 
         return Arr::get($response, 'Balance', 0);
     }
@@ -149,8 +149,7 @@ class SmsMisr extends Driver implements SmsGatewayContract
             'Code' => $code,
         ];
         $response = Http::post($this->base_url.'/vSMS', $params)->json();
-        $this->log('debug', "{$this->driver} send otp" , $response);
-
+        $this->log('debug', "{$this->driver} send otp", $response);
     }
 
     /**
@@ -173,7 +172,7 @@ class SmsMisr extends Driver implements SmsGatewayContract
         ];
 
         $response = Http::post($this->base_url.'/v2', $params)->json();
-        $this->log('debug', "{$this->driver} send message" , $response);
+        $this->log('debug', "{$this->driver} send message", $response);
 
         return $response;
     }

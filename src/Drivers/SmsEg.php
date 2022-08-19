@@ -122,7 +122,7 @@ class SmsEg extends Driver implements SmsGatewayContract
         $response = Http::get($this->base_url.'/getBalance?'.http_build_query($params));
         $result = $response->json();
 
-        $this->log('debug', "{$this->driver} balance" , $result);
+        $this->log('debug', "{$this->driver} balance", $result);
         if (isset($result['type']) && $result['type'] === 'error') {
             return 0;
         }
@@ -148,7 +148,7 @@ class SmsEg extends Driver implements SmsGatewayContract
         ];
 
         $response = Http::get($this->base_url.'/?'.http_build_query($params))->json();
-        $this->log('debug', "{$this->driver} send message" , $response);
+        $this->log('debug', "{$this->driver} send message", $response);
 
         return $response;
     }
@@ -169,7 +169,7 @@ class SmsEg extends Driver implements SmsGatewayContract
             'lang' => 'ar',
         ];
         $response = Http::post($this->base_url.'/otp-send', $params)->json();
-        $this->log('debug', "{$this->driver} send message" , $response);
+        $this->log('debug', "{$this->driver} send message", $response);
     }
 
     /**
@@ -189,7 +189,7 @@ class SmsEg extends Driver implements SmsGatewayContract
             'verify' => true,
         ];
         $response = Http::post($this->base_url.'/otp-check', $params)->json();
-        $this->log('debug', "{$this->driver} send message" , $response);
+        $this->log('debug', "{$this->driver} send message", $response);
 
         return isset($response['type']) && $response['type'] === 'success';
     }

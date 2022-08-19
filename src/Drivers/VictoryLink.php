@@ -24,6 +24,7 @@ class VictoryLink extends Driver implements SmsGatewayContract
      * @var string
      */
     private $driver;
+
     /**
      * VictoryLink Constructor.
      *
@@ -89,7 +90,7 @@ class VictoryLink extends Driver implements SmsGatewayContract
         $xml = simplexml_load_string($response->body());
         $result = json_decode(json_encode((array) $xml), true);
 
-        $this->log('debug', "{$this->driver} balance" , $result);
+        $this->log('debug', "{$this->driver} balance", $result);
 
         return $result[0] ?? 0;
     }
@@ -117,7 +118,7 @@ class VictoryLink extends Driver implements SmsGatewayContract
         $xml = simplexml_load_string($response->body());
 
         $result = json_decode(json_encode((array) $xml), true);
-        $this->log('debug', "{$this->driver} send message" , $result);
+        $this->log('debug', "{$this->driver} send message", $result);
 
         return $result;
     }
