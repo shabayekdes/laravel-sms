@@ -12,8 +12,18 @@ use Shabayek\Sms\Contracts\SmsGatewayContract;
  */
 class VictoryLink extends Driver implements SmsGatewayContract
 {
+    /**
+     * Base url.
+     *
+     * @var string
+     */
     protected $base_url = 'https://smsvas.vlserv.com/KannelSending/service.asmx';
-
+    /**
+     * Driver name.
+     *
+     * @var string
+     */
+    private $driver;
     /**
      * VictoryLink Constructor.
      *
@@ -22,6 +32,8 @@ class VictoryLink extends Driver implements SmsGatewayContract
      */
     public function __construct(array $config)
     {
+        $this->driver = $config['driver'];
+
         parent::__construct($config['username'], $config['password'], $config['sender_id']);
     }
 
@@ -77,6 +89,8 @@ class VictoryLink extends Driver implements SmsGatewayContract
         $xml = simplexml_load_string($response->body());
         $result = json_decode(json_encode((array) $xml), true);
 
+        $this->log('debug', "{$this->driver} balance" , $result);
+
         return $result[0] ?? 0;
     }
 
@@ -102,7 +116,10 @@ class VictoryLink extends Driver implements SmsGatewayContract
 
         $xml = simplexml_load_string($response->body());
 
-        return json_decode(json_encode((array) $xml), true);
+        $result = json_decode(json_encode((array) $xml), true);
+        $this->log('debug', "{$this->driver} send message" , $result);
+
+        return $result;
     }
 
     /**
@@ -112,16 +129,10 @@ class VictoryLink extends Driver implements SmsGatewayContract
      */
     private function getLanguage()
     {
-        switch ($this->language) {
-            case 'en':
-                $locale = 'E';
-                break;
-            case 'ar':
-                $locale = 'A';
-                break;
-            default:
-                $locale = 'E';
-                break;
+        if ($this->language == 'ar') {
+            $locale = 'A';
+        } else {
+            $locale = 'E';
         }
 
         return $locale;

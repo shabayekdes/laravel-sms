@@ -135,4 +135,15 @@ return [
         'en' => env('SMS_MESSAGE', 'Your verification code is: {code}'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Logging response
+    |--------------------------------------------------------------------------
+    |
+    | If set to `true` all output of the optimizer binaries
+    | will be appended to the default log.
+    |
+    */
+
+    'log_sms_activity' => true,
 ];

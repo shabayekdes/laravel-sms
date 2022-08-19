@@ -9,6 +9,11 @@ use Shabayek\Sms\Enums\Service;
 
 class SmsMisr extends Driver implements SmsGatewayContract
 {
+    /**
+     * Base url.
+     *
+     * @var string
+     */
     protected $base_url = 'https://smsmisr.com/api';
 
     /**
@@ -29,6 +34,12 @@ class SmsMisr extends Driver implements SmsGatewayContract
      * @var string
      */
     private $token;
+    /**
+     * Driver name.
+     *
+     * @var string
+     */
+    private $driver;
 
     /**
      * SmsMisr Constructor.
@@ -39,6 +50,7 @@ class SmsMisr extends Driver implements SmsGatewayContract
     public function __construct(array $config)
     {
         $this->service = $config['service'];
+        $this->driver = $config['driver'];
 
         $this->language = $this->getLanguage();
         $this->token = $config['token'];
@@ -108,14 +120,14 @@ class SmsMisr extends Driver implements SmsGatewayContract
             'request' => 'status',
         ];
 
-        $response = Http::post($this->base_url.'/Request?'.http_build_query($params));
-        $result = $response->json();
+        $response = Http::post($this->base_url.'/Request?'.http_build_query($params))->json();
 
-        if (isset($result['code']) && $result['code'] == 'Error') {
+        if (isset($response['code']) && $response['code'] == 'Error') {
             return 0;
         }
+        $this->log('debug', "{$this->driver} balance" , $response);
 
-        return Arr::get($result, 'Balance', 0);
+        return Arr::get($response, 'Balance', 0);
     }
 
     /**
@@ -136,7 +148,9 @@ class SmsMisr extends Driver implements SmsGatewayContract
             'Mobile' => $phone,
             'Code' => $code,
         ];
-        Http::post($this->base_url.'/vSMS', $params);
+        $response = Http::post($this->base_url.'/vSMS', $params)->json();
+        $this->log('debug', "{$this->driver} send otp" , $response);
+
     }
 
     /**
@@ -158,7 +172,10 @@ class SmsMisr extends Driver implements SmsGatewayContract
             'DelayUntil' => null,
         ];
 
-        return Http::post($this->base_url.'/v2', $params)->json();
+        $response = Http::post($this->base_url.'/v2', $params)->json();
+        $this->log('debug', "{$this->driver} send message" , $response);
+
+        return $response;
     }
 
     /**

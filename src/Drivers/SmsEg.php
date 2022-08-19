@@ -22,6 +22,13 @@ class SmsEg extends Driver implements SmsGatewayContract
     protected $base_url = 'https://smssmartegypt.com/sms/api';
 
     /**
+     * Driver name.
+     *
+     * @var string
+     */
+    private $driver;
+
+    /**
      * SmsEg Constructor.
      *
      * @param  array  $config
@@ -30,6 +37,7 @@ class SmsEg extends Driver implements SmsGatewayContract
     public function __construct(array $config)
     {
         $this->service = $config['service'];
+        $this->driver = $config['driver'];
 
         parent::__construct($config['username'], $config['password'], $config['sender_id']);
     }
@@ -114,6 +122,7 @@ class SmsEg extends Driver implements SmsGatewayContract
         $response = Http::get($this->base_url.'/getBalance?'.http_build_query($params));
         $result = $response->json();
 
+        $this->log('debug', "{$this->driver} balance" , $result);
         if (isset($result['type']) && $result['type'] === 'error') {
             return 0;
         }
@@ -138,7 +147,10 @@ class SmsEg extends Driver implements SmsGatewayContract
             'message' => $message,
         ];
 
-        return Http::get($this->base_url.'/?'.http_build_query($params))->json();
+        $response = Http::get($this->base_url.'/?'.http_build_query($params))->json();
+        $this->log('debug', "{$this->driver} send message" , $response);
+
+        return $response;
     }
 
     /**
@@ -156,7 +168,8 @@ class SmsEg extends Driver implements SmsGatewayContract
             'mobile' => $phone,
             'lang' => 'ar',
         ];
-        Http::post($this->base_url.'/otp-send', $params);
+        $response = Http::post($this->base_url.'/otp-send', $params)->json();
+        $this->log('debug', "{$this->driver} send message" , $response);
     }
 
     /**
@@ -175,10 +188,9 @@ class SmsEg extends Driver implements SmsGatewayContract
             'otp' => $otp,
             'verify' => true,
         ];
-        $response = Http::post($this->base_url.'/otp-check', $params);
+        $response = Http::post($this->base_url.'/otp-check', $params)->json();
+        $this->log('debug', "{$this->driver} send message" , $response);
 
-        $result = $response->json();
-
-        return isset($result['type']) && $result['type'] === 'success';
+        return isset($response['type']) && $response['type'] === 'success';
     }
 }

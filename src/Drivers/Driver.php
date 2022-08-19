@@ -4,8 +4,9 @@ namespace Shabayek\Sms\Drivers;
 
 use Exception;
 use Illuminate\Support\Str;
+use Psr\Log\LoggerInterface;
+use Shabayek\Sms\DisableLogger;
 use Shabayek\Sms\Enums\Service;
-
 /**
  * Driver class.
  *
@@ -43,6 +44,10 @@ abstract class Driver
      * @var string
      */
     protected $service = Service::SMS_NORMAL_SERVICE;
+    /**
+     * @var LoggerInterface
+     */
+    public $logger;
 
     /**
      * Driver Constructor.
@@ -59,6 +64,7 @@ abstract class Driver
         $this->sender_id = $sender_id;
 
         $this->language = config('sms.language');
+        $this->logger = $this->getLogger(config('sms'));
     }
 
     /**
@@ -121,5 +127,21 @@ abstract class Driver
         $this->language = $language;
 
         return $this;
+    }
+
+    private function getLogger($config)
+    {
+        $configuredLogger = $config['log_sms_activity'];
+
+        if ($configuredLogger === true) {
+            return app('log');
+        }
+
+        return new DisableLogger();
+    }
+
+    protected function log($level, $message, array $context = array())
+    {
+        $this->logger->{$level}($message, $context);
     }
 }
