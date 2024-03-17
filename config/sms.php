@@ -41,11 +41,11 @@ return [
         */
 
         'smseg' => [
-            'driver'    => 'smseg',
-            'username'  => env('SMS_USERNAME'),
-            'password'  => env('SMS_PASSWORD'),
+            'driver' => 'smseg',
+            'username' => env('SMS_USERNAME'),
+            'password' => env('SMS_PASSWORD'),
             'sender_id' => env('SMS_SENDER_ID'),
-            'service'   => env('SMS_SERVICE', 'normal'),
+            'service' => env('SMS_SERVICE', 'normal'),
         ],
 
         /*
@@ -61,11 +61,11 @@ return [
         */
 
         'smsmisr' => [
-            'driver'    => 'smsmisr',
-            'username'  => env('SMS_USERNAME'),
-            'password'  => env('SMS_PASSWORD'),
+            'driver' => 'smsmisr',
+            'username' => env('SMS_USERNAME'),
+            'password' => env('SMS_PASSWORD'),
             'sender_id' => env('SMS_SENDER_ID'),
-            'service'   => env('SMS_SERVICE', 'normal'),
+            'service' => env('SMS_SERVICE', 'normal'),
             'token' => env('SMS_TOKEN'),
             'msignature' => env('SMS_MSIGNATURE'),
             'sms_id' => env('SMS_SMS_ID'),
@@ -81,9 +81,9 @@ return [
         */
 
         'victorylink' => [
-            'driver'    => 'victorylink',
-            'username'  => env('SMS_USERNAME'),
-            'password'  => env('SMS_PASSWORD'),
+            'driver' => 'victorylink',
+            'username' => env('SMS_USERNAME'),
+            'password' => env('SMS_PASSWORD'),
             'sender_id' => env('SMS_SENDER_ID'),
         ],
 
@@ -97,11 +97,11 @@ return [
         */
 
         'ooredoo' => [
-            'driver'      => 'ooredoo',
-            'base_url'    => env('SMS_BASE_URL', 'https://messaging.ooredoo.qa/bms/soap/Messenger.asmx'),
-            'username'    => env('SMS_USERNAME'),
-            'password'    => env('SMS_PASSWORD'),
-            'sender_id'   => env('SMS_SENDER_ID'),
+            'driver' => 'ooredoo',
+            'base_url' => env('SMS_BASE_URL', 'https://messaging.ooredoo.qa/bms/soap/Messenger.asmx'),
+            'username' => env('SMS_USERNAME'),
+            'password' => env('SMS_PASSWORD'),
+            'sender_id' => env('SMS_SENDER_ID'),
             'customer_id' => env('SMS_CUSTOMER_ID'),
         ],
 
@@ -115,10 +115,10 @@ return [
         */
 
         'unifonic' => [
-            'driver'    => 'unifonic',
-            'username'    => env('SMS_USERNAME'),
-            'password'    => env('SMS_PASSWORD'),
-            'apps_id'   => env('SMS_APPS_ID'),
+            'driver' => 'unifonic',
+            'username' => env('SMS_USERNAME'),
+            'password' => env('SMS_PASSWORD'),
+            'apps_id' => env('SMS_APPS_ID'),
             'sender_id' => env('SMS_SENDER_ID'),
         ],
 

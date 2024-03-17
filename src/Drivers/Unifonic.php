@@ -86,11 +86,11 @@ class Unifonic extends Driver implements SmsGatewayContract
     private function sendMessageRequest($phone, $message)
     {
         $params = [
-            'AppSid'       => $this->apps_id,
-            'SenderID'     => $this->sender_id,
-            'Password'     => $this->password,
-            'Recipient'    => $phone,
-            'Body'         => $message,
+            'AppSid' => $this->apps_id,
+            'SenderID' => $this->sender_id,
+            'Password' => $this->password,
+            'Recipient' => $phone,
+            'Body' => $message,
             'responseType' => 'JSON',
         ];
 
