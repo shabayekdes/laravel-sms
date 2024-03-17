@@ -71,7 +71,7 @@ abstract class Driver
      *
      * @throws Exception
      */
-    public function verify(string $phone, int $otp, $actualOtp = null): bool
+    public function verify($phone, $otp, $actualOtp = null): bool
     {
         if (is_null($actualOtp)) {
             throw new \Exception('Actual otp is required for this service');

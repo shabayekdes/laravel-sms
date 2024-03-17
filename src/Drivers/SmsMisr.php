@@ -2,6 +2,7 @@
 
 namespace Shabayek\Sms\Drivers;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 use Shabayek\Sms\Contracts\SmsGatewayContract;
 use Shabayek\Sms\Enums\Service;
@@ -98,7 +99,7 @@ class SmsMisr extends Driver implements SmsGatewayContract
      *
      * @return int
      */
-    public function balance()
+    public function balance(): int
     {
         $params = [
             'username' => $this->username,
@@ -114,7 +115,7 @@ class SmsMisr extends Driver implements SmsGatewayContract
             return 0;
         }
 
-        return $result['balance'];
+        return Arr::get($result, 'Balance', 0);
     }
 
     /**
@@ -157,9 +158,7 @@ class SmsMisr extends Driver implements SmsGatewayContract
             'DelayUntil' => null,
         ];
 
-        $response = Http::post($this->base_url.'/v2', $params);
-
-        return $response->json();
+        return Http::post($this->base_url.'/v2', $params)->json();
     }
 
     /**
