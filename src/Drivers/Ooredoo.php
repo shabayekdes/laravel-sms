@@ -119,7 +119,32 @@ class Ooredoo extends Driver implements SmsGatewayContract
             return Http::get($this->base_url.'/HTTP_SendSms?'.http_build_query($params));
         });
 
-        $xml = simplexml_load_string($response->body());
+        if (! $response->successful()) {
+            return [];
+        }
+
+        return $this->parseXml($response->body());
+    }
+
+    /**
+     * Parse an xml response body.
+     *
+     * Bodies that are not well-formed xml give an empty array instead of
+     * a PHP warning, which Laravel would turn into an ErrorException.
+     *
+     * @param  string  $body
+     * @return array
+     */
+    private function parseXml($body): array
+    {
+        $previous = libxml_use_internal_errors(true);
+        $xml = simplexml_load_string($body);
+        libxml_clear_errors();
+        libxml_use_internal_errors($previous);
+
+        if ($xml === false) {
+            return [];
+        }
 
         return json_decode(json_encode((array) $xml), true);
     }

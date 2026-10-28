@@ -90,6 +90,51 @@ class VictoryLinkFeatureTest extends TestCase
     }
 
     /**
+     * @test
+     * @dataProvider unconfirmedResponses
+     */
+    public function it_does_not_report_success_without_provider_confirmation($body, $status)
+    {
+        $this->setConfig('victorylink');
+
+        $this->stubHttp([
+            'smsvas.vlserv.com/KannelSending/service.asmx/SendSMS*' => Http::response($body, $status),
+        ]);
+
+        $sms = Sms::send('0123456789', 'test message');
+
+        $this->assertFalse($sms['success']);
+        $this->assertEquals('Message not sent successfully', $sms['message']);
+    }
+
+    /**
+     * @test
+     * @dataProvider unconfirmedResponses
+     */
+    public function it_returns_null_when_the_otp_message_is_not_confirmed($body, $status)
+    {
+        $this->setConfig('victorylink');
+
+        $this->stubHttp([
+            'smsvas.vlserv.com/KannelSending/service.asmx/SendSMS*' => Http::response($body, $status),
+        ]);
+
+        $this->assertNull(Sms::sendOtp('0123456789'));
+    }
+
+    public static function unconfirmedResponses(): array
+    {
+        return [
+            'plain text server error' => ['Service Unavailable', 503],
+            'plain text body' => ['Service Unavailable', 200],
+            'empty body' => ['', 200],
+            'malformed xml' => ['<int xmlns="http://tempuri.org/">0', 200],
+            'html body' => ['<html><body>oops</body></html>', 200],
+            'server error with success body' => ['<?xml version="1.0" encoding="utf-8"?><int xmlns="http://tempuri.org/">0</int>', 500],
+        ];
+    }
+
+    /**
      * Set config.
      *
      * @param  string  $config

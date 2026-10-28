@@ -16,6 +16,7 @@ All notable changes to `shabayek/laravel-sms` are documented in this file.
 ### Fixed
 
 - SMS EG and SMS Misr `send()` no longer report success for HTTP errors, empty or malformed bodies, or responses without the expected success value.
+- Victory Link and Ooredoo `send()` return `success: false` (and `sendOtp()` returns `null`) for HTTP errors and for bodies that are not well-formed XML. Previously a plain-text error page threw an `ErrorException` from the XML parser, and an HTTP error with a success-looking body counted as sent.
 - `sendOtp()` returns `null` instead of a code when the message was not sent (SMS EG normal service, SMS Misr, Victory Link and Ooredoo). SMS Misr no longer returns a code without sending anything when `service` has an unknown value.
 - SMS EG `verify()` with service `otp` returns `false` when the verification request does not return HTTP 2xx, and rejects malformed codes without calling the provider.
 - The `Sms` alias in `composer.json` now points to the facade class `Shabayek\Sms\Facade\Sms`.
