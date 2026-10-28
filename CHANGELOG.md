@@ -2,9 +2,9 @@
 
 All notable changes to `shabayek/laravel-sms` are documented in this file.
 
-## Unreleased
+## v2.0 - 2026-10-28
 
-> Not ready for release: the SMS EG and SMS Misr success response formats used below come from this package's own code and have not been confirmed against the providers' API documentation.
+This is a major release: it requires PHP 8.0 and changes behaviour that applications may rely on. Read the upgrade notes before updating from 1.x.
 
 ### Security
 
@@ -56,5 +56,6 @@ All notable changes to `shabayek/laravel-sms` are documented in this file.
 
 - SMS EG with service `otp` returns `null` from `sendOtp()` whether or not the provider accepted the request, so the return value cannot be used to detect failures.
 - SMS Misr with service `otp` treats any HTTP 2xx response from `vSMS` as sent, because the response body format is unverified. A rejection returned inside a 200 response is not detected.
+- The SMS Misr driver still calls `/api/v2` and `/api/vSMS`, which are not described in SMS Misr's current public API documentation (that documents `/api/SMS/` and `/api/OTP/`). They are kept unchanged until SMS Misr confirms their status. The success values the drivers check, SMS EG's `type: "success"` and SMS Misr's `1901`, match the providers' documentation.
 - No driver confirms SMS delivery. A successful result means, at most, that the provider accepted the request.
 - Connection failures throw `Illuminate\Http\Client\ConnectionException`, while rejected messages return `null` or `success: false`.
