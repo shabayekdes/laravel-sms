@@ -33,11 +33,17 @@ class SmsManager extends Manager
      */
     public function __construct($app)
     {
+        parent::__construct($app);
+
         $this->app = $app;
     }
 
     /**
      * Create a new driver instance.
+     *
+     * A custom creator registered under the connection name wins, then one
+     * registered under the connection's driver. Creators receive the
+     * application and the connection config.
      *
      * @param  string  $driver
      * @return mixed
@@ -49,18 +55,27 @@ class SmsManager extends Manager
         $config = $this->getConfig($driver);
 
         if (is_null($config)) {
-            throw new InvalidArgumentException("Cache store [{$driver}] is not defined.");
+            throw new InvalidArgumentException("SMS connection [{$driver}] is not defined.");
         }
 
+        $name = $config['driver'] ?? null;
+
         if (isset($this->customCreators[$driver])) {
-            return $this->callCustomCreator($driver);
-        } else {
-            $method = 'create'.Str::studly($config['driver']).'Driver';
+            return $this->customCreators[$driver]($this->app, $config);
+        }
+
+        if (is_string($name) && isset($this->customCreators[$name])) {
+            return $this->customCreators[$name]($this->app, $config);
+        }
+
+        if (is_string($name)) {
+            $method = 'create'.Str::studly($name).'Driver';
 
             if (method_exists($this, $method)) {
                 return $this->$method($config);
             }
         }
+
         throw new InvalidArgumentException("Driver [$driver] not supported.");
     }
 

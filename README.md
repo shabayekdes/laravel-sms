@@ -187,12 +187,12 @@ we can finish our custom driver registration by calling the Sms facade's extend 
 use App\Sms\CustomSms;
 use Shabayek\Sms\Facade\Sms;
 
-Sms::extend('custom', function () {
-    return new CustomSms(config('sms.connections.custom'));
+Sms::extend('custom', function ($app, array $config) {
+    return new CustomSms($config);
 });
 ```
 
-> The first argument of `extend` must match the connection name (the key under **connections**), and the closure does not currently receive the application instance, so read the config with the `config()` helper as shown. Resolve the driver through the `Sms` facade, for example `Sms::driver('custom')`.
+> The closure receives the application and the config of the connection being resolved. The first argument of `extend` can be the connection name (the key under **connections**) or the `driver` value of the connection; a creator registered for the connection name wins. Resolve the driver through the `Sms` facade, for example `Sms::driver('custom')`.
 
 
 ### Testing

@@ -26,11 +26,13 @@ All notable changes to `shabayek/laravel-sms` are documented in this file.
 - The `Sms` alias in `composer.json` now points to the facade class `Shabayek\Sms\Facade\Sms`.
 - The Ooredoo driver can be resolved with `Sms::driver('ooredoo')` or by setting `SMS_CONNECTION=ooredoo`. Previously the manager threw `Driver [ooredoo] not supported.` and the driver had to be built by hand.
 - The Ooredoo and null drivers no longer create dynamic properties, which are deprecated since PHP 8.2.
+- Creators registered with `Sms::extend()` receive the application and the connection config. Previously they received `null`. A creator can now also be registered under the connection's `driver` value; one registered under the connection name still takes precedence.
+- An undefined connection reports `SMS connection [name] is not defined.` instead of `Cache store [name] is not defined.`
 
 ### Documentation
 
 - README examples now import the facade from `Shabayek\Sms\Facade\Sms` (previously the non-existent `Shabayek\Sms\Facades\Sms`), and the publish command names the actual provider `Shabayek\Sms\Providers\SmsServiceProvider`.
-- The custom driver example is valid PHP and registers the driver under its connection name.
+- The custom driver example is valid PHP and uses the config passed to the creator.
 - Fixed the `setLanguage()` example and the descriptions of the **normal** and **otp** services.
 
 ### Upgrade notes
@@ -41,6 +43,7 @@ All notable changes to `shabayek/laravel-sms` are documented in this file.
 - Custom drivers extending `Shabayek\Sms\Drivers\Driver` inherit a new protected `isValidOtp()` method that `verify()` uses. A subclass that already defines a method with that name replaces this validation with its own.
 - Transport exceptions thrown by the drivers no longer chain the original exception, so `getPrevious()` returns `null` and the Guzzle handler context is gone. Guzzle `RequestException`s carry a copy of the request without query string, headers or body, and no response. Code that parsed the old message or read these details needs updating.
 - Custom drivers extending `Shabayek\Sms\Drivers\Driver` inherit a new protected `sendSafely()` method. A subclass that already defines a method with that name must keep a compatible signature.
+- A creator registered with `Sms::extend()` now also applies to every connection whose `driver` matches its name. If you override a built-in driver such as `smseg` under its name and also have other connections using `'driver' => 'smseg'`, those connections now use your creator too. Register the creator under a name no connection uses as its `driver` to keep the old behaviour.
 - `Ooredoo::$customer_id` and `SmsNull::$config` are now declared `protected`. They used to be created as public dynamic properties, so code that read them from outside the class needs to keep its own copy of the config instead.
 - Gateway requests that take longer than 30 seconds (10 seconds to connect) now fail with a `ConnectionException`. Raise `SMS_TIMEOUT` / `SMS_CONNECT_TIMEOUT`, or set them to `0` to wait indefinitely as before. Published config files don't need the new keys; the defaults apply. A timed-out request may still have been accepted by the gateway, so don't resend automatically.
 
