@@ -90,10 +90,13 @@ abstract class Driver
      * Only non-negative integers and digit-only strings are accepted, so
      * booleans, floats and padded or numeric-looking strings never match.
      *
+     * No return type is declared, so subclasses that already define this
+     * method without one remain compatible.
+     *
      * @param  mixed  $otp
      * @return bool
      */
-    protected function isValidOtp($otp): bool
+    protected function isValidOtp($otp)
     {
         if (is_int($otp)) {
             return $otp >= 0;

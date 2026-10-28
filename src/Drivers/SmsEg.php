@@ -183,6 +183,6 @@ class SmsEg extends Driver implements SmsGatewayContract
 
         $result = $response->json();
 
-        return isset($result['type']) && $result['type'] === 'success';
+        return $response->successful() && isset($result['type']) && $result['type'] === 'success';
     }
 }

@@ -21,8 +21,12 @@ interface SmsGatewayContract
     /**
      * send otp verification.
      *
-     * Returns the generated code once the gateway accepts the message, or
-     * null when no code was sent or the gateway manages the code itself.
+     * Returns the generated code when the driver treats the request as sent,
+     * or null when it does not. How much that proves depends on the driver:
+     * some check a provider success value, the SMS Misr otp service checks
+     * only the HTTP status, and none of them confirm delivery. Drivers where
+     * the gateway manages the code itself (SMS EG otp service) return null
+     * whether or not the request succeeded. Connection failures throw.
      *
      * @param  string  $phone
      * @return int|null
