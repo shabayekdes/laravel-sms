@@ -2,7 +2,7 @@
 
 All notable changes to `shabayek/laravel-sms` are documented in this file.
 
-## Unreleased
+## v3.0.1 - 2026-10-29
 
 ### Fixed
 
