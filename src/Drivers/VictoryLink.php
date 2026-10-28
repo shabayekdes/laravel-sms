@@ -2,7 +2,7 @@
 
 namespace Shabayek\Sms\Drivers;
 
-use Illuminate\Support\Facades\Http;
+use Illuminate\Http\Client\PendingRequest;
 use Shabayek\Sms\Contracts\SmsGatewayContract;
 
 /**
@@ -36,7 +36,7 @@ class VictoryLink extends Driver implements SmsGatewayContract
     {
         $response = $this->sendMessageRequest($phone, $message);
 
-        $success = $response[0] === '0';
+        $success = ($response[0] ?? null) === '0';
         $message = $success ? 'Message sent successfully' : 'Message not sent successfully';
 
         return [
@@ -55,7 +55,10 @@ class VictoryLink extends Driver implements SmsGatewayContract
     {
         $code = $this->generateCode();
         $message = $this->getMessage($code);
-        $this->send($phone, $message);
+
+        if (! $this->send($phone, $message)['success']) {
+            return null;
+        }
 
         return $code;
     }
@@ -72,7 +75,9 @@ class VictoryLink extends Driver implements SmsGatewayContract
             'Password' => $this->password,
         ];
 
-        $response = Http::get($this->base_url.'/CheckCredit?'.http_build_query($params));
+        $response = $this->sendSafely(function (PendingRequest $http) use ($params) {
+            return $http->get($this->base_url.'/CheckCredit?'.http_build_query($params));
+        });
 
         $xml = simplexml_load_string($response->body());
         $result = json_decode(json_encode((array) $xml), true);
@@ -98,9 +103,36 @@ class VictoryLink extends Driver implements SmsGatewayContract
             'SMSText' => $message,
         ];
 
-        $response = Http::get($this->base_url.'/SendSMS?'.http_build_query($params));
+        $response = $this->sendSafely(function (PendingRequest $http) use ($params) {
+            return $http->get($this->base_url.'/SendSMS?'.http_build_query($params));
+        });
 
-        $xml = simplexml_load_string($response->body());
+        if (! $response->successful()) {
+            return [];
+        }
+
+        return $this->parseXml($response->body());
+    }
+
+    /**
+     * Parse an xml response body.
+     *
+     * Bodies that are not well-formed xml give an empty array instead of
+     * a PHP warning, which Laravel would turn into an ErrorException.
+     *
+     * @param  string  $body
+     * @return array
+     */
+    private function parseXml($body): array
+    {
+        $previous = libxml_use_internal_errors(true);
+        $xml = simplexml_load_string($body);
+        libxml_clear_errors();
+        libxml_use_internal_errors($previous);
+
+        if ($xml === false) {
+            return [];
+        }
 
         return json_decode(json_encode((array) $xml), true);
     }

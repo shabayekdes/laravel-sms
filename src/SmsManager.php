@@ -5,6 +5,7 @@ namespace Shabayek\Sms;
 use Illuminate\Support\Manager;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use Shabayek\Sms\Drivers\Ooredoo;
 use Shabayek\Sms\Drivers\SmsEg;
 use Shabayek\Sms\Drivers\SmsMisr;
 use Shabayek\Sms\Drivers\SmsNull;
@@ -32,11 +33,17 @@ class SmsManager extends Manager
      */
     public function __construct($app)
     {
+        parent::__construct($app);
+
         $this->app = $app;
     }
 
     /**
      * Create a new driver instance.
+     *
+     * A custom creator registered under the connection name wins, then one
+     * registered under the connection's driver. Creators receive the
+     * application and the connection config.
      *
      * @param  string  $driver
      * @return mixed
@@ -48,18 +55,27 @@ class SmsManager extends Manager
         $config = $this->getConfig($driver);
 
         if (is_null($config)) {
-            throw new InvalidArgumentException("Cache store [{$driver}] is not defined.");
+            throw new InvalidArgumentException("SMS connection [{$driver}] is not defined.");
         }
 
+        $name = $config['driver'] ?? null;
+
         if (isset($this->customCreators[$driver])) {
-            return $this->callCustomCreator($driver);
-        } else {
-            $method = 'create'.Str::studly($config['driver']).'Driver';
+            return $this->customCreators[$driver]($this->app, $config);
+        }
+
+        if (is_string($name) && isset($this->customCreators[$name])) {
+            return $this->customCreators[$name]($this->app, $config);
+        }
+
+        if (is_string($name)) {
+            $method = 'create'.Str::studly($name).'Driver';
 
             if (method_exists($this, $method)) {
                 return $this->$method($config);
             }
         }
+
         throw new InvalidArgumentException("Driver [$driver] not supported.");
     }
 
@@ -109,6 +125,17 @@ class SmsManager extends Manager
     protected function createVictorylinkDriver(array $config): VictoryLink
     {
         return new VictoryLink($config);
+    }
+
+    /**
+     * Create an instance of the ooredoo driver.
+     *
+     * @param  array  $config
+     * @return \Shabayek\Sms\Drivers\Ooredoo
+     */
+    protected function createOoredooDriver(array $config): Ooredoo
+    {
+        return new Ooredoo($config);
     }
 
     /**

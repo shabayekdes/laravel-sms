@@ -2,8 +2,8 @@
 
 namespace Shabayek\Sms\Drivers;
 
+use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Http;
 use Shabayek\Sms\Contracts\SmsGatewayContract;
 use Shabayek\Sms\Enums\Service;
 
@@ -44,12 +44,13 @@ class SmsEg extends Driver implements SmsGatewayContract
     public function send($phone, $message): array
     {
         $response = $this->sendMessageRequest($phone, $message);
+        $result = $response->json();
         $success = true;
         $msg = 'Message sent successfully';
 
-        if (isset($response['type']) && $response['type'] === 'error') {
+        if (! $response->successful() || Arr::get($result, 'type') !== 'success') {
             $success = false;
-            $msg = Arr::get($response, 'error.msg', 'Message not sent successfully');
+            $msg = Arr::get($result, 'error.msg', 'Message not sent successfully');
         }
 
         return [
@@ -75,7 +76,10 @@ class SmsEg extends Driver implements SmsGatewayContract
         if ($this->service == Service::SMS_NORMAL_SERVICE) {
             $code = $this->generateCode();
             $message = $this->getMessage($code);
-            $this->send($phone, $message);
+
+            if (! $this->send($phone, $message)['success']) {
+                $code = null;
+            }
         }
 
         return $code;
@@ -94,7 +98,7 @@ class SmsEg extends Driver implements SmsGatewayContract
     public function verify($phone, $otp, $actualOtp = null): bool
     {
         if ($this->service == Service::SMS_OTP_SERVICE) {
-            return $this->verifyOtpRequest($phone, $otp);
+            return $this->isValidOtp($otp) && $this->verifyOtpRequest($phone, $otp);
         }
 
         return parent::verify($phone, $otp, $actualOtp);
@@ -111,7 +115,9 @@ class SmsEg extends Driver implements SmsGatewayContract
             'username' => $this->username,
             'password' => $this->password,
         ];
-        $response = Http::get($this->base_url.'/getBalance?'.http_build_query($params));
+        $response = $this->sendSafely(function (PendingRequest $http) use ($params) {
+            return $http->get($this->base_url.'/getBalance?'.http_build_query($params));
+        });
         $result = $response->json();
 
         if (isset($result['type']) && $result['type'] === 'error') {
@@ -126,7 +132,7 @@ class SmsEg extends Driver implements SmsGatewayContract
      *
      * @param  string  $phone
      * @param  string  $message
-     * @return array
+     * @return \Illuminate\Http\Client\Response
      */
     private function sendMessageRequest($phone, $message)
     {
@@ -138,7 +144,9 @@ class SmsEg extends Driver implements SmsGatewayContract
             'message' => $message,
         ];
 
-        return Http::get($this->base_url.'/?'.http_build_query($params))->json();
+        return $this->sendSafely(function (PendingRequest $http) use ($params) {
+            return $http->get($this->base_url.'/?'.http_build_query($params));
+        });
     }
 
     /**
@@ -156,7 +164,9 @@ class SmsEg extends Driver implements SmsGatewayContract
             'mobile' => $phone,
             'lang' => 'ar',
         ];
-        Http::post($this->base_url.'/otp-send', $params);
+        $this->sendSafely(function (PendingRequest $http) use ($params) {
+            return $http->post($this->base_url.'/otp-send', $params);
+        });
     }
 
     /**
@@ -175,10 +185,12 @@ class SmsEg extends Driver implements SmsGatewayContract
             'otp' => $otp,
             'verify' => true,
         ];
-        $response = Http::post($this->base_url.'/otp-check', $params);
+        $response = $this->sendSafely(function (PendingRequest $http) use ($params) {
+            return $http->post($this->base_url.'/otp-check', $params);
+        });
 
         $result = $response->json();
 
-        return isset($result['type']) && $result['type'] === 'success';
+        return $response->successful() && isset($result['type']) && $result['type'] === 'success';
     }
 }

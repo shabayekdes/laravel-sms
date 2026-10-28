@@ -19,7 +19,7 @@
         }
     ],
     "require": {
-        "php": "^7.3|^7.4|^8.0",
+        "php": "^8.0",
         "guzzlehttp/guzzle": "^7.4"
     },
     "require-dev": {
@@ -48,7 +48,7 @@
                 "Shabayek\\Sms\\Providers\\SmsServiceProvider"
             ],
             "aliases": {
-                "Sms": "Shabayek\\Sms\\Facade"
+                "Sms": "Shabayek\\Sms\\Facade\\Sms"
             }
         }
     },

@@ -10,7 +10,7 @@ return [
     | Here you may specify which of the sms connections gateway below you wish
     | to use as your default connection for all companies work. Of course
     |
-    | Supported companies: "smseg", "smsmisr", "null"
+    | Supported companies: "smseg", "smsmisr", "victorylink", "ooredoo", "null"
     | if you choosing null, sms will be disabled
     |
     */
@@ -41,11 +41,11 @@ return [
         */
 
         'smseg' => [
-            'driver'    => 'smseg',
-            'username'  => env('SMS_USERNAME'),
-            'password'  => env('SMS_PASSWORD'),
+            'driver' => 'smseg',
+            'username' => env('SMS_USERNAME'),
+            'password' => env('SMS_PASSWORD'),
             'sender_id' => env('SMS_SENDER_ID'),
-            'service'   => env('SMS_SERVICE', 'normal'),
+            'service' => env('SMS_SERVICE', 'normal'),
         ],
 
         /*
@@ -61,11 +61,11 @@ return [
         */
 
         'smsmisr' => [
-            'driver'    => 'smsmisr',
-            'username'  => env('SMS_USERNAME'),
-            'password'  => env('SMS_PASSWORD'),
+            'driver' => 'smsmisr',
+            'username' => env('SMS_USERNAME'),
+            'password' => env('SMS_PASSWORD'),
             'sender_id' => env('SMS_SENDER_ID'),
-            'service'   => env('SMS_SERVICE', 'normal'),
+            'service' => env('SMS_SERVICE', 'normal'),
             'token' => env('SMS_TOKEN'),
             'msignature' => env('SMS_MSIGNATURE'),
             'sms_id' => env('SMS_SMS_ID'),
@@ -81,9 +81,9 @@ return [
         */
 
         'victorylink' => [
-            'driver'    => 'victorylink',
-            'username'  => env('SMS_USERNAME'),
-            'password'  => env('SMS_PASSWORD'),
+            'driver' => 'victorylink',
+            'username' => env('SMS_USERNAME'),
+            'password' => env('SMS_PASSWORD'),
             'sender_id' => env('SMS_SENDER_ID'),
         ],
 
@@ -97,11 +97,11 @@ return [
         */
 
         'ooredoo' => [
-            'driver'      => 'ooredoo',
-            'base_url'    => env('SMS_BASE_URL', 'https://messaging.ooredoo.qa/bms/soap/Messenger.asmx'),
-            'username'    => env('SMS_USERNAME'),
-            'password'    => env('SMS_PASSWORD'),
-            'sender_id'   => env('SMS_SENDER_ID'),
+            'driver' => 'ooredoo',
+            'base_url' => env('SMS_BASE_URL', 'https://messaging.ooredoo.qa/bms/soap/Messenger.asmx'),
+            'username' => env('SMS_USERNAME'),
+            'password' => env('SMS_PASSWORD'),
+            'sender_id' => env('SMS_SENDER_ID'),
             'customer_id' => env('SMS_CUSTOMER_ID'),
         ],
 
@@ -134,5 +134,21 @@ return [
         'ar' => env('SMS_MESSAGE', 'كود التحقق الخاص بك هو: {code}'),
         'en' => env('SMS_MESSAGE', 'Your verification code is: {code}'),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Gateway Request Timeouts
+    |--------------------------------------------------------------------------
+    |
+    | The maximum number of seconds to wait for a gateway to connect and to
+    | answer a request. A timed out request throws a ConnectionException.
+    | The gateway may still have accepted the message, so do not resend
+    | automatically. Set a value to 0 to wait indefinitely.
+    |
+    */
+
+    'timeout' => env('SMS_TIMEOUT', 30),
+
+    'connect_timeout' => env('SMS_CONNECT_TIMEOUT', 10),
 
 ];
