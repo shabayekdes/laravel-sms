@@ -29,7 +29,7 @@ class VictoryLinkFeatureTest extends TestCase
         config()->set('sms.connections.victorylink.password', $params['Password']);
         config()->set('sms.connections.victorylink.sender_id', $params['SMSSender']);
 
-        Http::fake([
+        $this->stubHttp([
             'https://smsvas.vlserv.com/KannelSending/service.asmx/SendSMS?'.http_build_query($params) => Http::response('<?xml version="1.0" encoding="utf-8"?><int xmlns="http://tempuri.org/">0</int>', 200),
         ]);
 
@@ -55,7 +55,7 @@ class VictoryLinkFeatureTest extends TestCase
         config()->set('sms.connections.victorylink.password', $params['Password']);
         config()->set('sms.connections.victorylink.sender_id', $params['SMSSender']);
 
-        Http::fake([
+        $this->stubHttp([
             'https://smsvas.vlserv.com/KannelSending/service.asmx/SendSMS?'.http_build_query($params) => Http::response('<?xml version="1.0" encoding="utf-8"?><int xmlns="http://tempuri.org/">-1</int>', 200),
         ]);
 
@@ -63,6 +63,30 @@ class VictoryLinkFeatureTest extends TestCase
 
         $this->assertFalse($sms['success']);
         $this->assertEquals('Message not sent successfully', $sms['message']);
+    }
+
+    /** @test */
+    public function it_returns_the_code_when_the_otp_message_is_accepted()
+    {
+        $this->setConfig('victorylink');
+
+        $this->stubHttp([
+            'smsvas.vlserv.com/KannelSending/service.asmx/SendSMS*' => Http::response('<?xml version="1.0" encoding="utf-8"?><int xmlns="http://tempuri.org/">0</int>', 200),
+        ]);
+
+        $this->assertSame(1234, Sms::sendOtp('0123456789'));
+    }
+
+    /** @test */
+    public function it_returns_null_when_the_otp_message_is_rejected()
+    {
+        $this->setConfig('victorylink');
+
+        $this->stubHttp([
+            'smsvas.vlserv.com/KannelSending/service.asmx/SendSMS*' => Http::response('<?xml version="1.0" encoding="utf-8"?><int xmlns="http://tempuri.org/">-1</int>', 200),
+        ]);
+
+        $this->assertNull(Sms::sendOtp('0123456789'));
     }
 
     /**
