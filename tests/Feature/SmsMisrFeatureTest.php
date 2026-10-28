@@ -104,7 +104,13 @@ class SmsMisrFeatureTest extends TestCase
         $this->assertNull(Sms::sendOtp('0123456789'));
     }
 
-    /** @test */
+    /**
+     * The vSMS response body is not interpreted because its format is not
+     * verified. This covers transport-level behavior only: a 2xx response
+     * returns the code, which does not prove the provider accepted it.
+     *
+     * @test
+     */
     public function it_sends_the_generated_code_with_the_otp_service()
     {
         $this->setConfig('smsmisr');

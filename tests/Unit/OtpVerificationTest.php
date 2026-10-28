@@ -61,6 +61,7 @@ class OtpVerificationTest extends TestCase
             'boolean false' => [false, 123456],
             'null' => [null, 123456],
             'empty string' => ['', 123456],
+            'empty strings on both sides' => ['', ''],
             'leading space' => [' 123456', 123456],
             'trailing space' => ['123456 ', 123456],
             'trailing newline' => ["123456\n", 123456],

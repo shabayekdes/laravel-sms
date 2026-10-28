@@ -66,14 +66,19 @@ abstract class TestCase extends Orchestra
     /**
      * Define environment setup.
      *
-     * Credentials are set explicitly so tests never depend on SMS_* variables
-     * from the developer's shell or the CI environment.
+     * Every value read from an SMS_* variable is set explicitly, so tests never
+     * depend on the developer's shell or the CI environment.
      *
      * @param  \Illuminate\Foundation\Application  $app
      * @return void
      */
     protected function getEnvironmentSetUp($app)
     {
+        $app['config']->set('sms.default', 'null');
+        $app['config']->set('sms.language', 'ar');
+        $app['config']->set('sms.message.ar', 'كود التحقق الخاص بك هو: {code}');
+        $app['config']->set('sms.message.en', 'Your verification code is: {code}');
+
         foreach (['smseg', 'smsmisr', 'victorylink', 'ooredoo'] as $connection) {
             $app['config']->set("sms.connections.{$connection}.username", self::TEST_USERNAME);
             $app['config']->set("sms.connections.{$connection}.password", self::TEST_PASSWORD);

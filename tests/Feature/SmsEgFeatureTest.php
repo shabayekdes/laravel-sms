@@ -189,6 +189,33 @@ class SmsEgFeatureTest extends TestCase
         $this->assertFalse(Sms::verify('0123456789', '123456'));
     }
 
+    /**
+     * @test
+     * @dataProvider unsuccessfulVerificationResponses
+     */
+    public function it_rejects_a_provider_managed_otp_when_verification_is_unsuccessful($body, $status)
+    {
+        $this->setConfig('smseg');
+        config()->set('sms.connections.smseg.service', 'otp');
+
+        $this->stubHttp([
+            'smssmartegypt.com/sms/api/otp-check' => Http::response($body, $status),
+        ]);
+
+        $this->assertFalse(Sms::verify('0123456789', '123456'));
+    }
+
+    /** @test */
+    public function it_returns_null_and_sends_nothing_for_an_unknown_service()
+    {
+        $this->setConfig('smseg');
+        config()->set('sms.connections.smseg.service', 'OTP');
+
+        $this->assertNull(Sms::sendOtp('0123456789'));
+
+        Http::assertNothingSent();
+    }
+
     /** @test */
     public function it_does_not_send_a_malformed_otp_to_the_provider()
     {
@@ -202,6 +229,16 @@ class SmsEgFeatureTest extends TestCase
         $this->assertFalse(Sms::verify('0123456789', true));
 
         Http::assertNothingSent();
+    }
+
+    public static function unsuccessfulVerificationResponses(): array
+    {
+        return [
+            'server error page' => ['<html>Server Error</html>', 500],
+            'server error with success body' => [['type' => 'success'], 500],
+            'malformed json' => ['{"type": "succ', 200],
+            'empty body' => ['', 200],
+        ];
     }
 
     public static function unconfirmedResponses(): array
