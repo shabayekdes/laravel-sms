@@ -78,6 +78,20 @@ class SmsManagerFeatureTest extends TestCase
         $this->assertSame([], $deprecations);
     }
 
+    /**
+     * A config published by an older version can lack keys added later.
+     *
+     * @test
+     *
+     * @dataProvider connections
+     */
+    public function it_creates_drivers_from_a_connection_without_optional_keys($connection)
+    {
+        config()->set("sms.connections.{$connection}", ['driver' => $connection]);
+
+        $this->assertNotNull(Sms::driver($connection));
+    }
+
     public static function connections(): array
     {
         return [

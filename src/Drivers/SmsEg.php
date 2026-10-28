@@ -30,9 +30,9 @@ class SmsEg extends Driver implements SmsGatewayContract
      */
     public function __construct(array $config)
     {
-        $this->service = $config['service'];
+        $this->service = $config['service'] ?? Service::SMS_NORMAL_SERVICE;
 
-        parent::__construct($config['username'], $config['password'], $config['sender_id']);
+        parent::__construct($config['username'] ?? null, $config['password'] ?? null, $config['sender_id'] ?? null);
     }
 
     /**

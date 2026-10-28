@@ -10,6 +10,7 @@ use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use Psr\Http\Message\RequestInterface;
 use Shabayek\Sms\Enums\ResponseCode;
 use Shabayek\Sms\Enums\Service;
@@ -128,12 +129,21 @@ abstract class Driver
     /**
      * Build the otp message.
      *
+     * A template without the {code} placeholder would send an otp message
+     * with no code in it, so it is rejected before anything is sent.
+     *
      * @param  int  $code
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     protected function getMessage($code): string
     {
-        $message = config('sms.message', 'Your verification code is: {code}');
+        $message = (string) config('sms.message', 'Your verification code is: {code}');
+
+        if (! Str::contains($message, '{code}')) {
+            throw new InvalidArgumentException('The sms.message template must contain the {code} placeholder.');
+        }
 
         return Str::replace('{code}', $code, $message);
     }

@@ -30,10 +30,10 @@ class Ooredoo extends Driver implements SmsGatewayContract
      */
     public function __construct(array $config)
     {
-        $this->base_url = $config['base_url'];
-        $this->customer_id = $config['customer_id'];
+        $this->base_url = $config['base_url'] ?? $this->base_url;
+        $this->customer_id = $config['customer_id'] ?? null;
 
-        parent::__construct($config['username'], $config['password'], $config['sender_id']);
+        parent::__construct($config['username'] ?? null, $config['password'] ?? null, $config['sender_id'] ?? null);
     }
 
     /**
@@ -134,9 +134,10 @@ class Ooredoo extends Driver implements SmsGatewayContract
             'recipientPhone' => $phone,
             'smsText' => $message,
             'defDate' => '',
-            'blink' => false,
-            'flash' => false,
-            'Private' => false,
+            // Literal strings, since http_build_query() turns false into 0.
+            'blink' => 'false',
+            'flash' => 'false',
+            'Private' => 'false',
         ];
 
         return $this->sendSafely(function (PendingRequest $http) use ($params) {

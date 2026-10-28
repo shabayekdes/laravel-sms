@@ -2,6 +2,7 @@
 
 namespace Shabayek\Sms\Tests\Feature;
 
+use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use Shabayek\Sms\Drivers\Ooredoo;
 use Shabayek\Sms\Facade\Sms;
@@ -65,6 +66,24 @@ class OoredooFeatureTest extends TestCase
         ]);
 
         $this->assertNull($this->driver()->sendOtp('0123456789'));
+    }
+
+    /** @test */
+    public function it_sends_boolean_flags_as_literal_strings()
+    {
+        $this->stubHttp([
+            'ooredoo.test/Messenger.asmx/HTTP_SendSms*' => Http::response('<?xml version="1.0" encoding="utf-8"?><SendResult><Result>OK</Result></SendResult>', 200),
+        ]);
+
+        $this->driver()->send('0123456789', 'test message');
+
+        Http::assertSent(function (Request $request) {
+            parse_str(parse_url($request->url(), PHP_URL_QUERY), $query);
+
+            return $query['blink'] === 'false'
+                && $query['flash'] === 'false'
+                && $query['Private'] === 'false';
+        });
     }
 
     public static function unconfirmedResponses(): array

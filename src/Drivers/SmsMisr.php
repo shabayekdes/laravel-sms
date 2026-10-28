@@ -39,13 +39,13 @@ class SmsMisr extends Driver implements SmsGatewayContract
      */
     public function __construct(array $config)
     {
-        $this->service = $config['service'];
+        $this->service = $config['service'] ?? Service::SMS_NORMAL_SERVICE;
 
-        $this->token = $config['token'];
-        $this->msignature = $config['msignature'];
-        $this->sms_id = $config['sms_id'];
+        $this->token = $config['token'] ?? null;
+        $this->msignature = $config['msignature'] ?? null;
+        $this->sms_id = $config['sms_id'] ?? null;
 
-        parent::__construct($config['username'], $config['password'], $config['sender_id']);
+        parent::__construct($config['username'] ?? null, $config['password'] ?? null, $config['sender_id'] ?? null);
     }
 
     /**
