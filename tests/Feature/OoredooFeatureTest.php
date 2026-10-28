@@ -14,6 +14,7 @@ use Shabayek\Sms\Tests\TestCase;
  * OoredooFeatureTest class.
  *
  * The XML fixtures follow the shape the driver parses, not provider docs.
+ * Fixtures built from the documentation are in DocumentedResponseTest.
  *
  * @author Esmail Shabayek <esmail.shabayek@gmail.com>
  */

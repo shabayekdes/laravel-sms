@@ -12,6 +12,10 @@ use Shabayek\Sms\Tests\TestCase;
 /**
  * SmsMisrFeatureTest class.
  *
+ * Legacy contract: these tests pin the undocumented /api/v2 and /api/vSMS
+ * endpoints the driver calls today. Replace them when the driver moves to
+ * the documented /api/SMS/ and /api/OTP/ endpoints (RM-BLK-MI-01/02).
+ *
  * @author Esmail Shabayek <esmail.shabayek@gmail.com>
  */
 class SmsMisrFeatureTest extends TestCase

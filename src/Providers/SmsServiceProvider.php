@@ -33,8 +33,10 @@ class SmsServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/../../config/sms.php', 'sms');
 
-        $this->app->bind('sms', function () {
-            return new SmsManager($this->app);
+        $this->app->singleton('sms', function ($app) {
+            return new SmsManager($app);
         });
+
+        $this->app->alias('sms', SmsManager::class);
     }
 }

@@ -11,6 +11,7 @@ use Shabayek\Sms\Drivers\SmsMisr;
 use Shabayek\Sms\Drivers\SmsNull;
 use Shabayek\Sms\Drivers\VictoryLink;
 use Shabayek\Sms\Facade\Sms;
+use Shabayek\Sms\SmsManager;
 use Shabayek\Sms\Tests\TestCase;
 
 /**
@@ -218,6 +219,39 @@ class SmsManagerFeatureTest extends TestCase
         $this->assertInstanceOf(SmsNull::class, Sms::driver('smseg'));
     }
 
+    /** @test */
+    #[Test]
+    public function it_resolves_the_same_manager_from_the_container()
+    {
+        $manager = $this->app->make('sms');
+
+        $this->assertInstanceOf(SmsManager::class, $manager);
+        $this->assertSame($manager, $this->app->make('sms'));
+        $this->assertSame($manager, $this->app->make(SmsManager::class));
+        $this->assertSame($manager, Sms::getFacadeRoot());
+    }
+
+    /** @test */
+    #[Test]
+    public function it_injects_the_manager_by_class_name()
+    {
+        $consumer = $this->app->make(SmsManagerConsumer::class);
+
+        $this->assertSame($this->app->make('sms'), $consumer->sms);
+    }
+
+    /** @test */
+    #[Test]
+    public function it_keeps_custom_creators_registered_on_an_injected_manager()
+    {
+        $this->app->make(SmsManager::class)->extend('custom', function () {
+            return new SmsNull([]);
+        });
+        config()->set('sms.connections.custom', ['driver' => 'custom']);
+
+        $this->assertInstanceOf(SmsNull::class, Sms::driver('custom'));
+    }
+
     /**
      * Set config.
      *
@@ -227,5 +261,18 @@ class SmsManagerFeatureTest extends TestCase
     private function setConfig(string $config)
     {
         config()->set('sms.default', $config);
+    }
+}
+
+/**
+ * A class that receives the manager through constructor injection.
+ */
+class SmsManagerConsumer
+{
+    public $sms;
+
+    public function __construct(SmsManager $sms)
+    {
+        $this->sms = $sms;
     }
 }
