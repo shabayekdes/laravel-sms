@@ -65,8 +65,12 @@ jobs:
 
       # The lock file pins Laravel 8 for local development, so each job
       # resolves its own Laravel and Testbench versions instead.
+      # Every Laravel 8-11 release has a security advisory, and Composer
+      # blocks those by default, so blocking is turned off for this test
+      # install only. It does not change what applications can install.
       - name: Install Composer Dependencies
         run: |
+          composer config policy.advisories.block false
           composer require --dev "laravel/framework:^${{ matrix.laravel }}.0" "orchestra/testbench:^${{ matrix.testbench }}.0" --no-update --no-interaction
           composer update --prefer-dist --no-interaction --no-progress --with-all-dependencies
 
