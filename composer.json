@@ -48,7 +48,7 @@
                 "Shabayek\\Sms\\Providers\\SmsServiceProvider"
             ],
             "aliases": {
-                "Sms": "Shabayek\\Sms\\Facade"
+                "Sms": "Shabayek\\Sms\\Facade\\Sms"
             }
         }
     },
