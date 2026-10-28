@@ -4,6 +4,7 @@ namespace Shabayek\Sms\Tests\Feature;
 
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
+use Shabayek\Sms\Enums\ResponseCode;
 use Shabayek\Sms\Facade\Sms;
 use Shabayek\Sms\Tests\TestCase;
 
@@ -73,7 +74,7 @@ class SmsEgFeatureTest extends TestCase
     }
 
     /** @test */
-    public function it_returns_the_smseg_error_message_on_rejection()
+    public function it_returns_the_smseg_error_message_as_provider_details_on_rejection()
     {
         $this->setConfig('smseg');
 
@@ -84,7 +85,9 @@ class SmsEgFeatureTest extends TestCase
         $sms = Sms::send('0123456789', 'test message');
 
         $this->assertFalse($sms['success']);
-        $this->assertEquals('Invalid sender', $sms['message']);
+        $this->assertSame(ResponseCode::Rejected, $sms['code']);
+        $this->assertEquals('Message not sent successfully', $sms['message']);
+        $this->assertEquals('Invalid sender', $sms['provider']['message']);
     }
 
     /**
@@ -118,7 +121,7 @@ class SmsEgFeatureTest extends TestCase
         $this->assertSame(1234, Sms::sendOtp('0123456789'));
 
         Http::assertSent(function (Request $request) {
-            return $request['message'] === 'كود التحقق الخاص بك هو: 1234';
+            return $request['message'] === 'Your verification code is: 1234';
         });
     }
 

@@ -51,9 +51,7 @@ class EnvironmentIsolationFeatureTest extends TestCase
     public function it_ignores_sms_environment_variables()
     {
         $this->assertSame('null', config('sms.default'));
-        $this->assertSame('ar', config('sms.language'));
-        $this->assertSame('كود التحقق الخاص بك هو: {code}', config('sms.message.ar'));
-        $this->assertSame('Your verification code is: {code}', config('sms.message.en'));
+        $this->assertSame('Your verification code is: {code}', config('sms.message'));
         $this->assertSame(self::TEST_USERNAME, config('sms.connections.smseg.username'));
         $this->assertSame('normal', config('sms.connections.smseg.service'));
         $this->assertSame(30, config('sms.timeout'));
@@ -71,7 +69,7 @@ class EnvironmentIsolationFeatureTest extends TestCase
 
         Http::assertSent(function (Request $request) {
             return $request['username'] === self::TEST_USERNAME
-                && $request['message'] === 'كود التحقق الخاص بك هو: 1234';
+                && $request['message'] === 'Your verification code is: 1234';
         });
     }
 }

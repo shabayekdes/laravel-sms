@@ -75,9 +75,7 @@ abstract class TestCase extends Orchestra
     protected function getEnvironmentSetUp($app)
     {
         $app['config']->set('sms.default', 'null');
-        $app['config']->set('sms.language', 'ar');
-        $app['config']->set('sms.message.ar', 'كود التحقق الخاص بك هو: {code}');
-        $app['config']->set('sms.message.en', 'Your verification code is: {code}');
+        $app['config']->set('sms.message', 'Your verification code is: {code}');
         $app['config']->set('sms.timeout', 30);
         $app['config']->set('sms.connect_timeout', 10);
 

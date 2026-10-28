@@ -5,6 +5,7 @@ namespace Shabayek\Sms\Drivers;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Arr;
 use Shabayek\Sms\Contracts\SmsGatewayContract;
+use Shabayek\Sms\Enums\ResponseCode;
 use Shabayek\Sms\Enums\Service;
 
 /**
@@ -45,18 +46,22 @@ class SmsEg extends Driver implements SmsGatewayContract
     {
         $response = $this->sendMessageRequest($phone, $message);
         $result = $response->json();
-        $success = true;
-        $msg = 'Message sent successfully';
+        $type = Arr::get($result, 'type');
+        $error = Arr::get($result, 'error.msg');
 
-        if (! $response->successful() || Arr::get($result, 'type') !== 'success') {
-            $success = false;
-            $msg = Arr::get($result, 'error.msg', 'Message not sent successfully');
+        if (! $response->successful()) {
+            return $this->response(ResponseCode::HttpError, null, $error);
         }
 
-        return [
-            'success' => $success,
-            'message' => $msg,
-        ];
+        if ($type === 'success') {
+            return $this->response(ResponseCode::Sent);
+        }
+
+        if ($type === 'error') {
+            return $this->response(ResponseCode::Rejected, null, $error);
+        }
+
+        return $this->response(ResponseCode::InvalidResponse, null, $error);
     }
 
     /**

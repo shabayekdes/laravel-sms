@@ -4,6 +4,7 @@ namespace Shabayek\Sms\Drivers;
 
 use Illuminate\Http\Client\PendingRequest;
 use Shabayek\Sms\Contracts\SmsGatewayContract;
+use Shabayek\Sms\Enums\ResponseCode;
 
 /**
  * VictoryLink class.
@@ -36,13 +37,21 @@ class VictoryLink extends Driver implements SmsGatewayContract
     {
         $response = $this->sendMessageRequest($phone, $message);
 
-        $success = ($response[0] ?? null) === '0';
-        $message = $success ? 'Message sent successfully' : 'Message not sent successfully';
+        if (! $response->successful()) {
+            return $this->response(ResponseCode::HttpError);
+        }
 
-        return [
-            'success' => $success,
-            'message' => $message,
-        ];
+        $result = $this->parseXml($response->body())[0] ?? null;
+
+        if (! is_string($result)) {
+            return $this->response(ResponseCode::InvalidResponse);
+        }
+
+        if ($result !== '0') {
+            return $this->response(ResponseCode::Rejected, $result);
+        }
+
+        return $this->response(ResponseCode::Sent, $result);
     }
 
     /**
@@ -90,7 +99,7 @@ class VictoryLink extends Driver implements SmsGatewayContract
      *
      * @param  string  $phone
      * @param  string  $message
-     * @return array
+     * @return \Illuminate\Http\Client\Response
      */
     private function sendMessageRequest($phone, $message)
     {
@@ -98,20 +107,14 @@ class VictoryLink extends Driver implements SmsGatewayContract
             'UserName' => $this->username,
             'Password' => $this->password,
             'SMSSender' => $this->sender_id,
-            'SMSLang' => $this->getLanguage(),
+            'SMSLang' => $this->getLanguage($message),
             'SMSReceiver' => $phone,
             'SMSText' => $message,
         ];
 
-        $response = $this->sendSafely(function (PendingRequest $http) use ($params) {
+        return $this->sendSafely(function (PendingRequest $http) use ($params) {
             return $http->get($this->base_url.'/SendSMS?'.http_build_query($params));
         });
-
-        if (! $response->successful()) {
-            return [];
-        }
-
-        return $this->parseXml($response->body());
     }
 
     /**
@@ -138,24 +141,13 @@ class VictoryLink extends Driver implements SmsGatewayContract
     }
 
     /**
-     * Get message language.
+     * Get message language from its text.
      *
+     * @param  string  $message
      * @return string
      */
-    private function getLanguage()
+    private function getLanguage($message)
     {
-        switch ($this->language) {
-            case 'en':
-                $locale = 'E';
-                break;
-            case 'ar':
-                $locale = 'A';
-                break;
-            default:
-                $locale = 'E';
-                break;
-        }
-
-        return $locale;
+        return $this->isUnicode($message) ? 'A' : 'E';
     }
 }

@@ -11,6 +11,7 @@ use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Psr\Http\Message\RequestInterface;
+use Shabayek\Sms\Enums\ResponseCode;
 use Shabayek\Sms\Enums\Service;
 use Throwable;
 
@@ -40,12 +41,6 @@ abstract class Driver
      */
     protected $sender_id;
     /**
-     * Language.
-     *
-     * @var string
-     */
-    protected $language;
-    /**
      * Service of sms gateway.
      *
      * @var string
@@ -65,8 +60,6 @@ abstract class Driver
         $this->username = $username;
         $this->password = $password;
         $this->sender_id = $sender_id;
-
-        $this->language = config('sms.language');
     }
 
     /**
@@ -133,17 +126,59 @@ abstract class Driver
     }
 
     /**
-     * Send sms message.
+     * Build the otp message.
      *
-     * @param  string  $phone
-     * @param  string  $message
-     * @return array
+     * @param  int  $code
+     * @return string
      */
     protected function getMessage($code): string
     {
-        $message = config("sms.message.{$this->language}", 'Your verification code is: {code}');
+        $message = config('sms.message', 'Your verification code is: {code}');
 
         return Str::replace('{code}', $code, $message);
+    }
+
+    /**
+     * Build a send result for the given response code.
+     *
+     * @param  \Shabayek\Sms\Enums\ResponseCode  $code
+     * @param  mixed  $providerCode
+     * @param  mixed  $providerMessage
+     * @return array
+     */
+    protected function response(ResponseCode $code, $providerCode = null, $providerMessage = null): array
+    {
+        return [
+            'success' => $code->successful(),
+            'code' => $code,
+            'message' => $code->message(),
+            'provider' => [
+                'code' => $providerCode,
+                'message' => $providerMessage,
+            ],
+        ];
+    }
+
+    /**
+     * Determine if the text has characters outside ASCII.
+     *
+     * @param  string  $text
+     * @return bool
+     */
+    protected function isUnicode($text): bool
+    {
+        return preg_match('/[^\x00-\x7F]/', (string) $text) === 1;
+    }
+
+    /**
+     * Determine if the text has Arabic characters.
+     *
+     * @param  string  $text
+     * @return bool
+     */
+    protected function isArabic($text): bool
+    {
+        return preg_match('/\p{Arabic}/u', (string) $text) === 1;
     }
 
     /**
@@ -228,18 +263,5 @@ abstract class Driver
         $uri = $request->getUri()->withUserInfo('')->withQuery('')->withFragment('');
 
         return new Request($request->getMethod(), $uri);
-    }
-
-    /**
-     * Language.
-     *
-     * @param  string  $language  Language
-     * @return self
-     */
-    public function setLanguage($language): self
-    {
-        $this->language = $language;
-
-        return $this;
     }
 }

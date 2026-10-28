@@ -12,6 +12,12 @@ interface SmsGatewayContract
     /**
      * Send sms message.
      *
+     * Returns success, a \Shabayek\Sms\Enums\ResponseCode case, the
+     * message configured in sms.messages for that code, and the provider's
+     * own code and message when the gateway returned them:
+     * ['success' => bool, 'code' => ResponseCode, 'message' => string,
+     *  'provider' => ['code' => mixed, 'message' => mixed]].
+     *
      * @param  string  $phone
      * @param  string  $message
      * @return array
