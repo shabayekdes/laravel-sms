@@ -1,0 +1,60 @@
+/* Laravel SMS brand tokens. See assets/branding/BRAND.md. */
+:root {
+  --lsms-navy: #101828;
+  --lsms-blue: #2563eb;
+  --lsms-blue-light: #60a5fa;
+  --lsms-mint: #2dd4bf;
+  --lsms-surface: #f8fafc;
+  --lsms-hero-glow: rgba(96, 165, 250, 0.22);
+
+  /* Infima primary scale around Electric Blue. */
+  --ifm-color-primary: #2563eb;
+  --ifm-color-primary-dark: #1d58d8;
+  --ifm-color-primary-darker: #1c53cc;
+  --ifm-color-primary-darkest: #1d4ed8;
+  --ifm-color-primary-light: #3b73ed;
+  --ifm-color-primary-lighter: #4a7eee;
+  --ifm-color-primary-lightest: #6e97f1;
+
+  --ifm-font-color-base: var(--lsms-navy);
+  --ifm-heading-color: var(--lsms-navy);
+  --ifm-background-surface-color: #ffffff;
+  --ifm-code-font-size: 92%;
+  --ifm-font-family-monospace: ui-monospace, SFMono-Regular, 'JetBrains Mono', Menlo, Consolas, monospace;
+  --ifm-navbar-height: 4rem;
+  --ifm-card-background-color: #ffffff;
+  --docusaurus-highlighted-code-line-bg: rgba(37, 99, 235, 0.1);
+}
+
+html[data-theme='dark'] {
+  --lsms-hero-glow: rgba(37, 99, 235, 0.3);
+
+  --ifm-color-primary: #60a5fa;
+  --ifm-color-primary-dark: #4096f9;
+  --ifm-color-primary-darker: #308ef9;
+  --ifm-color-primary-darkest: #0a77f2;
+  --ifm-color-primary-light: #80b4fb;
+  --ifm-color-primary-lighter: #90bcfb;
+  --ifm-color-primary-lightest: #bfd8fd;
+
+  --ifm-background-color: var(--lsms-navy);
+  --ifm-background-surface-color: #0c1322;
+  --ifm-navbar-background-color: #0c1322;
+  --ifm-font-color-base: #e2e8f0;
+  --ifm-heading-color: #ffffff;
+  --ifm-card-background-color: #1d2939;
+  --docusaurus-highlighted-code-line-bg: rgba(96, 165, 250, 0.15);
+}
+
+/* The logo images already contain the wordmark. */
+.navbar__logo {
+  height: 2rem;
+}
+
+.footer--dark {
+  --ifm-footer-background-color: var(--lsms-navy);
+}
+
+html[data-theme='dark'] .footer--dark {
+  --ifm-footer-background-color: #0c1322;
+}
