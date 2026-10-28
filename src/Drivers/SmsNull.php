@@ -12,6 +12,13 @@ use Shabayek\Sms\Contracts\SmsGatewayContract;
 class SmsNull extends Driver implements SmsGatewayContract
 {
     /**
+     * Connection config.
+     *
+     * @var array
+     */
+    protected $config;
+
+    /**
      * SmsNull Constructor.
      *
      * @param  array  $config

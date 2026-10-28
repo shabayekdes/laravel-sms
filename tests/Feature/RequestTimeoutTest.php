@@ -4,7 +4,6 @@ namespace Shabayek\Sms\Tests\Feature;
 
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
-use Shabayek\Sms\Drivers\Ooredoo;
 use Shabayek\Sms\Facade\Sms;
 use Shabayek\Sms\Tests\TestCase;
 
@@ -114,10 +113,7 @@ class RequestTimeoutTest extends TestCase
             },
         ]);
 
-        // The manager can't resolve Ooredoo yet, so it is built directly.
-        $driver = $connection === 'ooredoo'
-            ? new Ooredoo(config('sms.connections.ooredoo'))
-            : Sms::driver($connection);
+        $driver = Sms::driver($connection);
 
         switch ($operation) {
             case 'send':

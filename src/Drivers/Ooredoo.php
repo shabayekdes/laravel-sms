@@ -15,7 +15,14 @@ class Ooredoo extends Driver implements SmsGatewayContract
     protected $base_url = 'https://messaging.ooredoo.qa/bms/soap/Messenger.asmx';
 
     /**
-     * VictoryLink Constructor.
+     * Customer ID.
+     *
+     * @var string
+     */
+    protected $customer_id;
+
+    /**
+     * Ooredoo Constructor.
      *
      * @param  array  $config
      * @return void

@@ -5,6 +5,7 @@ namespace Shabayek\Sms;
 use Illuminate\Support\Manager;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use Shabayek\Sms\Drivers\Ooredoo;
 use Shabayek\Sms\Drivers\SmsEg;
 use Shabayek\Sms\Drivers\SmsMisr;
 use Shabayek\Sms\Drivers\SmsNull;
@@ -109,6 +110,17 @@ class SmsManager extends Manager
     protected function createVictorylinkDriver(array $config): VictoryLink
     {
         return new VictoryLink($config);
+    }
+
+    /**
+     * Create an instance of the ooredoo driver.
+     *
+     * @param  array  $config
+     * @return \Shabayek\Sms\Drivers\Ooredoo
+     */
+    protected function createOoredooDriver(array $config): Ooredoo
+    {
+        return new Ooredoo($config);
     }
 
     /**

@@ -8,7 +8,6 @@ use GuzzleHttp\Exception\TooManyRedirectsException;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Request;
 use RuntimeException;
-use Shabayek\Sms\Drivers\Ooredoo;
 use Shabayek\Sms\Facade\Sms;
 use Shabayek\Sms\Tests\TestCase;
 use Throwable;
@@ -175,10 +174,7 @@ class TransportExceptionRedactionTest extends TestCase
             config()->set("sms.connections.{$connection}.service", $service);
         }
 
-        // The manager can't resolve Ooredoo yet, so it is built directly.
-        $driver = $connection === 'ooredoo'
-            ? new Ooredoo(config('sms.connections.ooredoo'))
-            : Sms::driver($connection);
+        $driver = Sms::driver($connection);
 
         try {
             switch ($operation) {

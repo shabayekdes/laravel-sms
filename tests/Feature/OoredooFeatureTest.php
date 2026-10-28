@@ -4,12 +4,12 @@ namespace Shabayek\Sms\Tests\Feature;
 
 use Illuminate\Support\Facades\Http;
 use Shabayek\Sms\Drivers\Ooredoo;
+use Shabayek\Sms\Facade\Sms;
 use Shabayek\Sms\Tests\TestCase;
 
 /**
  * OoredooFeatureTest class.
  *
- * The manager can't resolve Ooredoo yet, so the driver is built directly.
  * The XML fixtures follow the shape the driver parses, not provider docs.
  *
  * @author Esmail Shabayek <esmail.shabayek@gmail.com>
@@ -80,12 +80,12 @@ class OoredooFeatureTest extends TestCase
     }
 
     /**
-     * Build the Ooredoo driver from the test configuration.
+     * Resolve the Ooredoo driver through the manager.
      *
      * @return \Shabayek\Sms\Drivers\Ooredoo
      */
     private function driver(): Ooredoo
     {
-        return new Ooredoo(config('sms.connections.ooredoo'));
+        return Sms::driver('ooredoo');
     }
 }

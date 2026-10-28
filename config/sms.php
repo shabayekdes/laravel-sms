@@ -10,7 +10,7 @@ return [
     | Here you may specify which of the sms connections gateway below you wish
     | to use as your default connection for all companies work. Of course
     |
-    | Supported companies: "smseg", "smsmisr", "null"
+    | Supported companies: "smseg", "smsmisr", "victorylink", "ooredoo", "null"
     | if you choosing null, sms will be disabled
     |
     */

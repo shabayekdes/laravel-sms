@@ -24,6 +24,8 @@ All notable changes to `shabayek/laravel-sms` are documented in this file.
 - `sendOtp()` returns `null` instead of a code when the message was not sent (SMS EG normal service, SMS Misr, Victory Link and Ooredoo). SMS Misr no longer returns a code without sending anything when `service` has an unknown value.
 - SMS EG `verify()` with service `otp` returns `false` when the verification request does not return HTTP 2xx, and rejects malformed codes without calling the provider.
 - The `Sms` alias in `composer.json` now points to the facade class `Shabayek\Sms\Facade\Sms`.
+- The Ooredoo driver can be resolved with `Sms::driver('ooredoo')` or by setting `SMS_CONNECTION=ooredoo`. Previously the manager threw `Driver [ooredoo] not supported.` and the driver had to be built by hand.
+- The Ooredoo and null drivers no longer create dynamic properties, which are deprecated since PHP 8.2.
 
 ### Documentation
 
@@ -39,6 +41,7 @@ All notable changes to `shabayek/laravel-sms` are documented in this file.
 - Custom drivers extending `Shabayek\Sms\Drivers\Driver` inherit a new protected `isValidOtp()` method that `verify()` uses. A subclass that already defines a method with that name replaces this validation with its own.
 - Transport exceptions thrown by the drivers no longer chain the original exception, so `getPrevious()` returns `null` and the Guzzle handler context is gone. Guzzle `RequestException`s carry a copy of the request without query string, headers or body, and no response. Code that parsed the old message or read these details needs updating.
 - Custom drivers extending `Shabayek\Sms\Drivers\Driver` inherit a new protected `sendSafely()` method. A subclass that already defines a method with that name must keep a compatible signature.
+- `Ooredoo::$customer_id` and `SmsNull::$config` are now declared `protected`. They used to be created as public dynamic properties, so code that read them from outside the class needs to keep its own copy of the config instead.
 - Gateway requests that take longer than 30 seconds (10 seconds to connect) now fail with a `ConnectionException`. Raise `SMS_TIMEOUT` / `SMS_CONNECT_TIMEOUT`, or set them to `0` to wait indefinitely as before. Published config files don't need the new keys; the defaults apply. A timed-out request may still have been accepted by the gateway, so don't resend automatically.
 
 ### Known limitations
