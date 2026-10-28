@@ -58,7 +58,9 @@ class Ooredoo extends Driver implements SmsGatewayContract
         $code = $this->generateCode();
         $message = $this->getMessage($code);
 
-        $this->send($phone, $message);
+        if (! $this->send($phone, $message)['success']) {
+            return null;
+        }
 
         return $code;
     }

@@ -77,20 +77,45 @@ abstract class Driver
             throw new \Exception('Actual otp is required for this service');
         }
 
-        return $otp == $actualOtp;
+        if (! $this->isValidOtp($otp) || ! $this->isValidOtp($actualOtp)) {
+            return false;
+        }
+
+        return hash_equals((string) $actualOtp, (string) $otp);
+    }
+
+    /**
+     * Determine if the given value is a well-formed otp.
+     *
+     * Only non-negative integers and digit-only strings are accepted, so
+     * booleans, floats and padded or numeric-looking strings never match.
+     *
+     * @param  mixed  $otp
+     * @return bool
+     */
+    protected function isValidOtp($otp): bool
+    {
+        if (is_int($otp)) {
+            return $otp >= 0;
+        }
+
+        return is_string($otp) && preg_match('/^\d+\z/', $otp) === 1;
     }
 
     /**
      * Generate otp code.
      *
+     * The fixed development code is limited to the local and testing
+     * environments; any other environment name gets a random code.
+     *
      * @return int
      */
     protected function generateCode()
     {
-        if (app()->environment('production')) {
-            $code = rand(100000, 999999);
-        } else {
+        if (app()->environment('local', 'testing')) {
             $code = 1234;
+        } else {
+            $code = random_int(100000, 999999);
         }
 
         return $code;

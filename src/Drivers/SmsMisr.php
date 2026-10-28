@@ -58,10 +58,11 @@ class SmsMisr extends Driver implements SmsGatewayContract
     public function send($phone, $message): array
     {
         $response = $this->sendMessageRequest($phone, $message);
+        $code = Arr::get($response->json(), 'code');
         $success = true;
         $message = 'Message sent successfully';
 
-        if (isset($response['code']) && $response['code'] != 1901) {
+        if (! $response->successful() || ! is_scalar($code) || (string) $code !== '1901') {
             $success = false;
             $message = 'Message not sent successfully';
         }
@@ -81,17 +82,18 @@ class SmsMisr extends Driver implements SmsGatewayContract
     public function sendOtp($phone)
     {
         $code = $this->generateCode();
+        $sent = false;
 
         if ($this->service == Service::SMS_OTP_SERVICE) {
-            $this->sendOtpRequest($phone, $code);
+            $sent = $this->sendOtpRequest($phone, $code);
         }
 
         if ($this->service == Service::SMS_NORMAL_SERVICE) {
             $message = $this->getMessage($code);
-            $this->send($phone, $message);
+            $sent = $this->send($phone, $message)['success'];
         }
 
-        return $code;
+        return $sent ? $code : null;
     }
 
     /**
@@ -121,9 +123,12 @@ class SmsMisr extends Driver implements SmsGatewayContract
     /**
      * Send sms with otp services.
      *
+     * Only the HTTP status is checked: the vSMS response format is not
+     * documented in this package, so any 2xx response counts as accepted.
+     *
      * @param  string  $phone
      * @param  int  $code
-     * @return void
+     * @return bool
      */
     private function sendOtpRequest($phone, $code)
     {
@@ -136,7 +141,8 @@ class SmsMisr extends Driver implements SmsGatewayContract
             'Mobile' => $phone,
             'Code' => $code,
         ];
-        Http::post($this->base_url.'/vSMS', $params);
+
+        return Http::post($this->base_url.'/vSMS', $params)->successful();
     }
 
     /**
@@ -144,7 +150,7 @@ class SmsMisr extends Driver implements SmsGatewayContract
      *
      * @param  string  $phone
      * @param  string  $message
-     * @return array
+     * @return \Illuminate\Http\Client\Response
      */
     private function sendMessageRequest($phone, $message)
     {
@@ -158,7 +164,7 @@ class SmsMisr extends Driver implements SmsGatewayContract
             'DelayUntil' => null,
         ];
 
-        return Http::post($this->base_url.'/v2', $params)->json();
+        return Http::post($this->base_url.'/v2', $params);
     }
 
     /**

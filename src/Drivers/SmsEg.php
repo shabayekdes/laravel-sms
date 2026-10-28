@@ -44,12 +44,13 @@ class SmsEg extends Driver implements SmsGatewayContract
     public function send($phone, $message): array
     {
         $response = $this->sendMessageRequest($phone, $message);
+        $result = $response->json();
         $success = true;
         $msg = 'Message sent successfully';
 
-        if (isset($response['type']) && $response['type'] === 'error') {
+        if (! $response->successful() || Arr::get($result, 'type') !== 'success') {
             $success = false;
-            $msg = Arr::get($response, 'error.msg', 'Message not sent successfully');
+            $msg = Arr::get($result, 'error.msg', 'Message not sent successfully');
         }
 
         return [
@@ -75,7 +76,10 @@ class SmsEg extends Driver implements SmsGatewayContract
         if ($this->service == Service::SMS_NORMAL_SERVICE) {
             $code = $this->generateCode();
             $message = $this->getMessage($code);
-            $this->send($phone, $message);
+
+            if (! $this->send($phone, $message)['success']) {
+                $code = null;
+            }
         }
 
         return $code;
@@ -94,7 +98,7 @@ class SmsEg extends Driver implements SmsGatewayContract
     public function verify($phone, $otp, $actualOtp = null): bool
     {
         if ($this->service == Service::SMS_OTP_SERVICE) {
-            return $this->verifyOtpRequest($phone, $otp);
+            return $this->isValidOtp($otp) && $this->verifyOtpRequest($phone, $otp);
         }
 
         return parent::verify($phone, $otp, $actualOtp);
@@ -126,7 +130,7 @@ class SmsEg extends Driver implements SmsGatewayContract
      *
      * @param  string  $phone
      * @param  string  $message
-     * @return array
+     * @return \Illuminate\Http\Client\Response
      */
     private function sendMessageRequest($phone, $message)
     {
@@ -138,7 +142,7 @@ class SmsEg extends Driver implements SmsGatewayContract
             'message' => $message,
         ];
 
-        return Http::get($this->base_url.'/?'.http_build_query($params))->json();
+        return Http::get($this->base_url.'/?'.http_build_query($params));
     }
 
     /**

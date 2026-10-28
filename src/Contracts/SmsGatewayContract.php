@@ -21,6 +21,9 @@ interface SmsGatewayContract
     /**
      * send otp verification.
      *
+     * Returns the generated code once the gateway accepts the message, or
+     * null when no code was sent or the gateway manages the code itself.
+     *
      * @param  string  $phone
      * @return int|null
      */
