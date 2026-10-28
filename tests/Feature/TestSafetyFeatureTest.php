@@ -15,6 +15,7 @@ class TestSafetyFeatureTest extends TestCase
 {
     /**
      * @test
+     *
      * @dataProvider connections
      */
     public function it_blocks_requests_without_a_stub($connection)

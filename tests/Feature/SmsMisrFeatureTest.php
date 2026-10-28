@@ -64,6 +64,7 @@ class SmsMisrFeatureTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider unconfirmedResponses
      */
     public function it_does_not_report_success_without_provider_confirmation($body, $status)

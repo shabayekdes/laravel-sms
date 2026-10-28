@@ -38,6 +38,7 @@ class OoredooFeatureTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider unconfirmedResponses
      */
     public function it_does_not_report_success_without_provider_confirmation($body, $status)
@@ -54,6 +55,7 @@ class OoredooFeatureTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider unconfirmedResponses
      */
     public function it_returns_null_when_the_otp_message_is_not_confirmed($body, $status)

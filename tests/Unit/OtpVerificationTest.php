@@ -15,6 +15,7 @@ class OtpVerificationTest extends TestCase
 {
     /**
      * @test
+     *
      * @dataProvider matchingOtps
      */
     public function it_accepts_a_matching_otp($otp, $actualOtp)
@@ -24,6 +25,7 @@ class OtpVerificationTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider rejectedOtps
      */
     public function it_rejects_a_wrong_or_malformed_otp($otp, $actualOtp)

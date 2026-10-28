@@ -20,6 +20,7 @@ class SendOtpConnectionFailureTest extends TestCase
 {
     /**
      * @test
+     *
      * @dataProvider otpFlows
      */
     public function it_propagates_connection_failures_from_send_otp($connection, $service, $url)

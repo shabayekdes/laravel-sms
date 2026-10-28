@@ -32,6 +32,7 @@ class TransportExceptionRedactionTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider operations
      */
     public function it_removes_request_details_from_connection_failures($connection, $service, $url, $host, $operation)
@@ -60,6 +61,7 @@ class TransportExceptionRedactionTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider operations
      */
     public function it_removes_request_details_from_other_transport_failures($connection, $service, $url, $host, $operation)

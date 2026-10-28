@@ -89,6 +89,7 @@ class SmsEgFeatureTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider unconfirmedResponses
      */
     public function it_does_not_report_success_without_provider_confirmation($body, $status)
@@ -191,6 +192,7 @@ class SmsEgFeatureTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider unsuccessfulVerificationResponses
      */
     public function it_rejects_a_provider_managed_otp_when_verification_is_unsuccessful($body, $status)

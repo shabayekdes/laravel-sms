@@ -26,6 +26,7 @@ class OtpGenerationTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider developmentEnvironments
      */
     public function it_uses_the_development_code_in_local_and_testing($environment)
@@ -37,6 +38,7 @@ class OtpGenerationTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider nonDevelopmentEnvironments
      */
     public function it_generates_a_six_digit_code_outside_local_and_testing($environment)
