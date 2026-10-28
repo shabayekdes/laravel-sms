@@ -23,3 +23,9 @@ Homestead.json
 .phpunit.result.cache
 .idea
 .vscode
+
+# Local audit reports and roadmap
+/laravel_sms_audit.md
+/audit_review/
+/provider_audit/
+/ROADMAP.md
