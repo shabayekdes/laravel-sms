@@ -3,6 +3,7 @@
 namespace Shabayek\Sms\Drivers;
 
 use Shabayek\Sms\Contracts\SmsGatewayContract;
+use Shabayek\Sms\Enums\ResponseCode;
 
 /**
  * SMS Null class.
@@ -38,10 +39,7 @@ class SmsNull extends Driver implements SmsGatewayContract
      */
     public function send($phone, $message): array
     {
-        return [
-            'success' => false,
-            'message' => 'SMS driver is disabled',
-        ];
+        return $this->response(ResponseCode::Disabled);
     }
 
     /**

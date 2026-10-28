@@ -5,6 +5,7 @@ namespace Shabayek\Sms\Drivers;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Arr;
 use Shabayek\Sms\Contracts\SmsGatewayContract;
+use Shabayek\Sms\Enums\ResponseCode;
 use Shabayek\Sms\Enums\Service;
 
 class SmsMisr extends Driver implements SmsGatewayContract
@@ -40,7 +41,6 @@ class SmsMisr extends Driver implements SmsGatewayContract
     {
         $this->service = $config['service'];
 
-        $this->language = $this->getLanguage();
         $this->token = $config['token'];
         $this->msignature = $config['msignature'];
         $this->sms_id = $config['sms_id'];
@@ -59,18 +59,21 @@ class SmsMisr extends Driver implements SmsGatewayContract
     {
         $response = $this->sendMessageRequest($phone, $message);
         $code = Arr::get($response->json(), 'code');
-        $success = true;
-        $message = 'Message sent successfully';
+        $providerCode = is_scalar($code) ? (string) $code : null;
 
-        if (! $response->successful() || ! is_scalar($code) || (string) $code !== '1901') {
-            $success = false;
-            $message = 'Message not sent successfully';
+        if (! $response->successful()) {
+            return $this->response(ResponseCode::HttpError, $providerCode);
         }
 
-        return [
-            'success' => $success,
-            'message' => $message,
-        ];
+        if ($providerCode === null) {
+            return $this->response(ResponseCode::InvalidResponse);
+        }
+
+        if ($providerCode !== '1901') {
+            return $this->response(ResponseCode::Rejected, $providerCode);
+        }
+
+        return $this->response(ResponseCode::Sent, $providerCode);
     }
 
     /**
@@ -161,7 +164,7 @@ class SmsMisr extends Driver implements SmsGatewayContract
         $params = [
             'Username' => $this->username,
             'password' => $this->password,
-            'language' => $this->getLanguage(),
+            'language' => $this->getLanguage($message),
             'sender' => $this->sender_id,
             'Mobile' => $phone,
             'message' => $message,
@@ -174,24 +177,19 @@ class SmsMisr extends Driver implements SmsGatewayContract
     }
 
     /**
-     * Get message language.
+     * Get message language from its text.
      *
+     * 1 is English, 2 is Arabic and 3 is Unicode.
+     *
+     * @param  string  $message
      * @return int
      */
-    private function getLanguage()
+    private function getLanguage($message)
     {
-        switch ($this->language) {
-            case 'en':
-                $locale = 1;
-                break;
-            case 'ar':
-                $locale = 2;
-                break;
-            default:
-                $locale = 3;
-                break;
+        if (! $this->isUnicode($message)) {
+            return 1;
         }
 
-        return $locale;
+        return $this->isArabic($message) ? 2 : 3;
     }
 }

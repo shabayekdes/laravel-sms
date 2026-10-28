@@ -109,30 +109,34 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | SMS Message Locale Configuration
-    |--------------------------------------------------------------------------
-    |
-    | The sms message locale determines the default locale that will be used
-    |
-    */
-
-    'language' => env('SMS_LANGUAGE', 'ar'),
-
-    /*
-    |--------------------------------------------------------------------------
     | SMS Custom Message For Otp Service
     |--------------------------------------------------------------------------
     |
-    | The sms custom message that will be used it will be replaced with
-    | the default message "Your verification code is: {code}"
-    | put your custom message here and use the keyword
-    | {code} to replace it with the verification code
+    | The message sent with the otp code. Put your custom message here and
+    | use the keyword {code} to replace it with the verification code.
+    | The encoding sent to the gateway is detected from the text.
     |
     */
 
-    'message' => [
-        'ar' => env('SMS_MESSAGE', 'كود التحقق الخاص بك هو: {code}'),
-        'en' => env('SMS_MESSAGE', 'Your verification code is: {code}'),
+    'message' => env('SMS_MESSAGE', 'Your verification code is: {code}'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Response Messages
+    |--------------------------------------------------------------------------
+    |
+    | The text returned under the "message" key of a send() result for each
+    | response code. Check the "code" key in your application and change
+    | these texts freely. Codes are listed in Shabayek\Sms\Enums\ResponseCode.
+    |
+    */
+
+    'messages' => [
+        'sent' => 'Message sent successfully',
+        'rejected' => 'Message not sent successfully',
+        'http_error' => 'Message not sent successfully',
+        'invalid_response' => 'Message not sent successfully',
+        'disabled' => 'SMS driver is disabled',
     ],
 
     /*

@@ -82,15 +82,54 @@ $actualOtp = '123456'; // this is the actual otp that you sent to the user
 $verify = Sms::verify($phone, $otp, $actualOtp); // third param is optional only for SMS EG with service otp
 ```
 
-- You can set language for the OTP sms message.
-
-> en: For English ar: For Arabic
+- Change the OTP message with `SMS_MESSAGE` (or `message` in `config/sms.php`). Use `{code}` where the code goes. The message can be in any language: the encoding sent to the gateway (English, Arabic or Unicode) is detected from the text.
 
 ``` php
+SMS_MESSAGE="Your verification code is: {code}"
+```
+
+### Response codes
+
+`send()` returns an array with a `code` you can check (a `Shabayek\Sms\Enums\ResponseCode` case), a `message` you can customize, and the gateway's own code and message when it returned them:
+
+``` php
+[
+    'success' => false,
+    'code' => ResponseCode::Rejected,
+    'message' => 'Message not sent successfully',
+    'provider' => ['code' => '1902', 'message' => null],
+]
+```
+
+| Value | Case | Meaning |
+| --- | --- | --- |
+| `sent` | `ResponseCode::Sent` | The gateway accepted the message. |
+| `rejected` | `ResponseCode::Rejected` | The gateway answered with a failure value. See `provider`. |
+| `http_error` | `ResponseCode::HttpError` | The gateway answered with a non-2xx HTTP status. |
+| `invalid_response` | `ResponseCode::InvalidResponse` | The body was empty, malformed or missing the expected value. |
+| `disabled` | `ResponseCode::Disabled` | The `null` driver is in use, so nothing was sent. |
+
+``` php
+use Shabayek\Sms\Enums\ResponseCode;
 use Shabayek\Sms\Facade\Sms;
 
-$sms = Sms::setLanguage('ar')
-        ->sendOtp('0120000000');
+$result = Sms::send('0120000000', 'Hello world');
+
+if ($result['code'] === ResponseCode::Rejected) {
+    logger()->warning('SMS rejected', $result['provider']);
+}
+```
+
+Check `code` rather than `message` in your application. The case serializes to its string value in JSON, and `ResponseCode::from('rejected')` turns a stored value back into a case. To change the texts, publish the config and edit the `messages` array:
+
+``` php
+'messages' => [
+    'sent' => 'Message sent successfully',
+    'rejected' => 'Message not sent successfully',
+    'http_error' => 'Message not sent successfully',
+    'invalid_response' => 'Message not sent successfully',
+    'disabled' => 'SMS driver is disabled',
+],
 ```
 
 ### OTP results and verification
@@ -130,6 +169,7 @@ To create our custom sms driver, we first need to implement the `Shabayek\Sms\Co
 namespace App\Sms;
 
 use Shabayek\Sms\Contracts\SmsGatewayContract;
+use Shabayek\Sms\Enums\ResponseCode;
 
 class CustomSms implements SmsGatewayContract
 {
@@ -143,7 +183,7 @@ class CustomSms implements SmsGatewayContract
     public function send($phone, $message): array
     {
         // Call your gateway here.
-        return ['success' => true, 'message' => 'Message sent successfully'];
+        return ['success' => true, 'code' => ResponseCode::Sent, 'message' => ResponseCode::Sent->message(), 'provider' => ['code' => null, 'message' => null]];
     }
 
     public function sendOtp($phone)

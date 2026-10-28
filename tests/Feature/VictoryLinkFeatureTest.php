@@ -21,7 +21,7 @@ class VictoryLinkFeatureTest extends TestCase
             'UserName' => 'test',
             'Password' => 'secret',
             'SMSSender' => 'test',
-            'SMSLang' => 'A',
+            'SMSLang' => 'E',
             'SMSReceiver' => '0123456789',
             'SMSText' => 'test message',
         ];
@@ -47,7 +47,7 @@ class VictoryLinkFeatureTest extends TestCase
             'UserName' => 'test',
             'Password' => 'secret',
             'SMSSender' => 'test',
-            'SMSLang' => 'A',
+            'SMSLang' => 'E',
             'SMSReceiver' => '0123456789',
             'SMSText' => 'test message',
         ];

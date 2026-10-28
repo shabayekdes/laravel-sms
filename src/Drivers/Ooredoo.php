@@ -4,6 +4,7 @@ namespace Shabayek\Sms\Drivers;
 
 use Illuminate\Http\Client\PendingRequest;
 use Shabayek\Sms\Contracts\SmsGatewayContract;
+use Shabayek\Sms\Enums\ResponseCode;
 
 /**
  * Ooredoo class.
@@ -46,12 +47,21 @@ class Ooredoo extends Driver implements SmsGatewayContract
     {
         $response = $this->sendMessageRequest($phone, $message);
 
-        $success = isset($response['Result']) && $response['Result'] == 'OK';
+        if (! $response->successful()) {
+            return $this->response(ResponseCode::HttpError);
+        }
 
-        return [
-            'success' => $success,
-            'message' => $success ? 'Message sent successfully' : 'Message not sent successfully',
-        ];
+        $result = $this->parseXml($response->body())['Result'] ?? null;
+
+        if (! is_string($result)) {
+            return $this->response(ResponseCode::InvalidResponse);
+        }
+
+        if ($result !== 'OK') {
+            return $this->response(ResponseCode::Rejected, $result);
+        }
+
+        return $this->response(ResponseCode::Sent, $result);
     }
 
     /**
@@ -104,7 +114,7 @@ class Ooredoo extends Driver implements SmsGatewayContract
      *
      * @param  string  $phone
      * @param  string  $message
-     * @return array
+     * @return \Illuminate\Http\Client\Response
      */
     private function sendMessageRequest($phone, $message)
     {
@@ -113,7 +123,7 @@ class Ooredoo extends Driver implements SmsGatewayContract
             'userPassword' => $this->password,
             'originator' => $this->sender_id,
             'customerID' => $this->customer_id,
-            'messageType' => $this->getLanguage(),
+            'messageType' => $this->getLanguage($message),
             'recipientPhone' => $phone,
             'smsText' => $message,
             'defDate' => '',
@@ -122,15 +132,9 @@ class Ooredoo extends Driver implements SmsGatewayContract
             'Private' => false,
         ];
 
-        $response = $this->sendSafely(function (PendingRequest $http) use ($params) {
+        return $this->sendSafely(function (PendingRequest $http) use ($params) {
             return $http->get($this->base_url.'/HTTP_SendSms?'.http_build_query($params));
         });
-
-        if (! $response->successful()) {
-            return [];
-        }
-
-        return $this->parseXml($response->body());
     }
 
     /**
@@ -157,24 +161,13 @@ class Ooredoo extends Driver implements SmsGatewayContract
     }
 
     /**
-     * Get message language.
+     * Get message type from its text.
      *
+     * @param  string  $message
      * @return string
      */
-    private function getLanguage()
+    private function getLanguage($message)
     {
-        switch ($this->language) {
-            case 'en':
-                $locale = 'Latin';
-                break;
-            case 'ar':
-                $locale = 'ArabicWithArabicNumbers';
-                break;
-            default:
-                $locale = 'ArabicWithArabicNumbers';
-                break;
-        }
-
-        return $locale;
+        return $this->isUnicode($message) ? 'ArabicWithArabicNumbers' : 'Latin';
     }
 }
