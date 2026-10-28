@@ -75,7 +75,9 @@ class VictoryLink extends Driver implements SmsGatewayContract
             'Password' => $this->password,
         ];
 
-        $response = Http::get($this->base_url.'/CheckCredit?'.http_build_query($params));
+        $response = $this->sendSafely(function () use ($params) {
+            return Http::get($this->base_url.'/CheckCredit?'.http_build_query($params));
+        });
 
         $xml = simplexml_load_string($response->body());
         $result = json_decode(json_encode((array) $xml), true);
@@ -101,7 +103,9 @@ class VictoryLink extends Driver implements SmsGatewayContract
             'SMSText' => $message,
         ];
 
-        $response = Http::get($this->base_url.'/SendSMS?'.http_build_query($params));
+        $response = $this->sendSafely(function () use ($params) {
+            return Http::get($this->base_url.'/SendSMS?'.http_build_query($params));
+        });
 
         $xml = simplexml_load_string($response->body());
 

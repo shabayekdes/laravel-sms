@@ -78,7 +78,9 @@ class Ooredoo extends Driver implements SmsGatewayContract
             'userPassword' => $this->password,
         ];
 
-        $response = Http::get($this->base_url.'/HTTP_Authenticate2?'.http_build_query($params));
+        $response = $this->sendSafely(function () use ($params) {
+            return Http::get($this->base_url.'/HTTP_Authenticate2?'.http_build_query($params));
+        });
 
         $response = simplexml_load_string($response->body());
         $arr = json_decode(json_encode((array) $response), true);
@@ -113,7 +115,9 @@ class Ooredoo extends Driver implements SmsGatewayContract
             'Private' => false,
         ];
 
-        $response = Http::get($this->base_url.'/HTTP_SendSms?'.http_build_query($params));
+        $response = $this->sendSafely(function () use ($params) {
+            return Http::get($this->base_url.'/HTTP_SendSms?'.http_build_query($params));
+        });
 
         $xml = simplexml_load_string($response->body());
 

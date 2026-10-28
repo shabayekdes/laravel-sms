@@ -110,7 +110,9 @@ class SmsMisr extends Driver implements SmsGatewayContract
             'request' => 'status',
         ];
 
-        $response = Http::post($this->base_url.'/Request?'.http_build_query($params));
+        $response = $this->sendSafely(function () use ($params) {
+            return Http::post($this->base_url.'/Request?'.http_build_query($params));
+        });
         $result = $response->json();
 
         if (isset($result['code']) && $result['code'] == 'Error') {
@@ -142,7 +144,9 @@ class SmsMisr extends Driver implements SmsGatewayContract
             'Code' => $code,
         ];
 
-        return Http::post($this->base_url.'/vSMS', $params)->successful();
+        return $this->sendSafely(function () use ($params) {
+            return Http::post($this->base_url.'/vSMS', $params);
+        })->successful();
     }
 
     /**
@@ -164,7 +168,9 @@ class SmsMisr extends Driver implements SmsGatewayContract
             'DelayUntil' => null,
         ];
 
-        return Http::post($this->base_url.'/v2', $params);
+        return $this->sendSafely(function () use ($params) {
+            return Http::post($this->base_url.'/v2', $params);
+        });
     }
 
     /**

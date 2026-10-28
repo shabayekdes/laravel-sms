@@ -3,8 +3,14 @@
 namespace Shabayek\Sms\Drivers;
 
 use Exception;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\TooManyRedirectsException;
+use GuzzleHttp\Psr7\Request;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Str;
+use Psr\Http\Message\RequestInterface;
 use Shabayek\Sms\Enums\Service;
+use Throwable;
 
 /**
  * Driver class.
@@ -136,6 +142,75 @@ abstract class Driver
         $message = config("sms.message.{$this->language}", 'Your verification code is: {code}');
 
         return Str::replace('{code}', $code, $message);
+    }
+
+    /**
+     * Run a gateway request without exposing request details on failure.
+     *
+     * Guzzle transport errors end with the full request URL, which can hold
+     * credentials, phone numbers, message text and otp codes, and keep the
+     * request itself. They are rethrown as the same exception type with a
+     * message that only names the gateway host, a request without query or
+     * body, and no previous exception, since that would carry the original.
+     *
+     * @param  callable  $request
+     * @return \Illuminate\Http\Client\Response
+     *
+     * @throws \Illuminate\Http\Client\ConnectionException
+     * @throws \GuzzleHttp\Exception\RequestException
+     */
+    protected function sendSafely(callable $request)
+    {
+        try {
+            return $request();
+        } catch (ConnectionException $e) {
+            throw new ConnectionException($this->transportErrorMessage($e->getPrevious()));
+        } catch (RequestException $e) {
+            $class = $e instanceof TooManyRedirectsException ? TooManyRedirectsException::class : RequestException::class;
+
+            throw new $class($this->transportErrorMessage($e), $this->redactRequest($e->getRequest()));
+        }
+    }
+
+    /**
+     * Build a transport error message from safe details only.
+     *
+     * @param  \Throwable|null  $e
+     * @return string
+     */
+    private function transportErrorMessage(?Throwable $e): string
+    {
+        $host = null;
+        $errno = null;
+
+        if ($e !== null && method_exists($e, 'getRequest')) {
+            $host = $e->getRequest()->getUri()->getHost();
+        }
+
+        if ($e !== null && method_exists($e, 'getHandlerContext')) {
+            $errno = $e->getHandlerContext()['errno'] ?? null;
+        }
+
+        $message = $host ? "SMS gateway request to {$host} failed" : 'SMS gateway request failed';
+
+        if (is_int($errno)) {
+            $message .= " (cURL error {$errno})";
+        }
+
+        return $message.'. Request details were removed from this message.';
+    }
+
+    /**
+     * Copy a request without user info, query string, headers or body.
+     *
+     * @param  \Psr\Http\Message\RequestInterface  $request
+     * @return \Psr\Http\Message\RequestInterface
+     */
+    private function redactRequest(RequestInterface $request): RequestInterface
+    {
+        $uri = $request->getUri()->withUserInfo('')->withQuery('')->withFragment('');
+
+        return new Request($request->getMethod(), $uri);
     }
 
     /**
