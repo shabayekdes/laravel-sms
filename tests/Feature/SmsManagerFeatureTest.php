@@ -3,12 +3,15 @@
 namespace Shabayek\Sms\Tests\Feature;
 
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Shabayek\Sms\Drivers\Ooredoo;
 use Shabayek\Sms\Drivers\SmsEg;
 use Shabayek\Sms\Drivers\SmsMisr;
 use Shabayek\Sms\Drivers\SmsNull;
 use Shabayek\Sms\Drivers\VictoryLink;
 use Shabayek\Sms\Facade\Sms;
+use Shabayek\Sms\SmsManager;
 use Shabayek\Sms\Tests\TestCase;
 
 /**
@@ -19,6 +22,7 @@ use Shabayek\Sms\Tests\TestCase;
 class SmsManagerFeatureTest extends TestCase
 {
     /** @test */
+    #[Test]
     public function it_can_sms_manager_instance_of_smseg()
     {
         $this->setConfig('smseg');
@@ -29,6 +33,7 @@ class SmsManagerFeatureTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_sms_manager_instance_of_smsmisr()
     {
         $this->setConfig('smsmisr');
@@ -39,6 +44,7 @@ class SmsManagerFeatureTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_sms_manager_instance_of_victorylink()
     {
         $this->setConfig('victorylink');
@@ -47,6 +53,7 @@ class SmsManagerFeatureTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_sms_manager_instance_of_ooredoo()
     {
         $this->setConfig('ooredoo');
@@ -59,6 +66,8 @@ class SmsManagerFeatureTest extends TestCase
      *
      * @dataProvider connections
      */
+    #[Test]
+    #[DataProvider('connections')]
     public function it_creates_drivers_without_dynamic_properties($connection)
     {
         $deprecations = [];
@@ -78,6 +87,22 @@ class SmsManagerFeatureTest extends TestCase
         $this->assertSame([], $deprecations);
     }
 
+    /**
+     * A config published by an older version can lack keys added later.
+     *
+     * @test
+     *
+     * @dataProvider connections
+     */
+    #[Test]
+    #[DataProvider('connections')]
+    public function it_creates_drivers_from_a_connection_without_optional_keys($connection)
+    {
+        config()->set("sms.connections.{$connection}", ['driver' => $connection]);
+
+        $this->assertNotNull(Sms::driver($connection));
+    }
+
     public static function connections(): array
     {
         return [
@@ -90,6 +115,7 @@ class SmsManagerFeatureTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_sms_manager_instance_of_sms_null()
     {
         $sms = Sms::driver();
@@ -98,6 +124,7 @@ class SmsManagerFeatureTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_can_sms_manager_throw_exception_with_undefined_driver()
     {
         $this->setConfig('test');
@@ -109,6 +136,7 @@ class SmsManagerFeatureTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_throws_for_a_connection_with_an_unsupported_driver()
     {
         config()->set('sms.connections.broken', ['driver' => 'unknown']);
@@ -120,6 +148,7 @@ class SmsManagerFeatureTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_passes_the_application_and_connection_config_to_custom_creators()
     {
         $config = ['driver' => 'custom', 'username' => 'custom-user'];
@@ -136,6 +165,7 @@ class SmsManagerFeatureTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_still_calls_custom_creators_without_parameters()
     {
         config()->set('sms.connections.custom', ['driver' => 'custom']);
@@ -148,6 +178,7 @@ class SmsManagerFeatureTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_finds_custom_creators_by_driver_name()
     {
         config()->set('sms.connections.primary', ['driver' => 'custom', 'sender_id' => 'Primary']);
@@ -162,6 +193,7 @@ class SmsManagerFeatureTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_prefers_the_creator_registered_for_the_connection_name()
     {
         config()->set('sms.connections.primary', ['driver' => 'custom']);
@@ -177,6 +209,7 @@ class SmsManagerFeatureTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_lets_a_custom_creator_replace_a_built_in_driver()
     {
         Sms::extend('smseg', function () {
@@ -184,6 +217,39 @@ class SmsManagerFeatureTest extends TestCase
         });
 
         $this->assertInstanceOf(SmsNull::class, Sms::driver('smseg'));
+    }
+
+    /** @test */
+    #[Test]
+    public function it_resolves_the_same_manager_from_the_container()
+    {
+        $manager = $this->app->make('sms');
+
+        $this->assertInstanceOf(SmsManager::class, $manager);
+        $this->assertSame($manager, $this->app->make('sms'));
+        $this->assertSame($manager, $this->app->make(SmsManager::class));
+        $this->assertSame($manager, Sms::getFacadeRoot());
+    }
+
+    /** @test */
+    #[Test]
+    public function it_injects_the_manager_by_class_name()
+    {
+        $consumer = $this->app->make(SmsManagerConsumer::class);
+
+        $this->assertSame($this->app->make('sms'), $consumer->sms);
+    }
+
+    /** @test */
+    #[Test]
+    public function it_keeps_custom_creators_registered_on_an_injected_manager()
+    {
+        $this->app->make(SmsManager::class)->extend('custom', function () {
+            return new SmsNull([]);
+        });
+        config()->set('sms.connections.custom', ['driver' => 'custom']);
+
+        $this->assertInstanceOf(SmsNull::class, Sms::driver('custom'));
     }
 
     /**
@@ -195,5 +261,18 @@ class SmsManagerFeatureTest extends TestCase
     private function setConfig(string $config)
     {
         config()->set('sms.default', $config);
+    }
+}
+
+/**
+ * A class that receives the manager through constructor injection.
+ */
+class SmsManagerConsumer
+{
+    public $sms;
+
+    public function __construct(SmsManager $sms)
+    {
+        $this->sms = $sms;
     }
 }

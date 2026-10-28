@@ -40,6 +40,8 @@ Laravel SMS sends text messages and one-time passwords through several SMS gatew
 - [Response codes](#response-codes)
 - [OTP results and verification](#otp-results-and-verification)
 - [Gateway response notes](#gateway-response-notes)
+- [Your application's responsibilities](#your-applications-responsibilities)
+- [Balance](#balance)
 - [Adding custom drivers](#adding-custom-drivers)
 - [Testing](#testing)
 - [Contributing](#contributing)
@@ -62,10 +64,12 @@ Laravel SMS sends text messages and one-time passwords through several SMS gatew
 | Gateway | Connection | `send` | `sendOtp` | `balance` | OTP service |
 | --- | --- | :---: | :---: | :---: | --- |
 | [SMS EG](https://www.smseg.com/en) | `smseg` | ✓ | ✓ | ✓ | `normal` or `otp` (the gateway generates and checks the code) |
-| [SMS Misr](https://www.sms.com.eg/website) | `smsmisr` | ✓ | ✓ | ✓ | `normal` or `otp` (the package's code is sent through the OTP endpoint) |
-| [Victory Link](http://www.victorylink.com/) | `victorylink` | ✓ | ✓ | ✓ | `normal` only |
-| [Ooredoo](https://www.ooredoo.com/en/) | `ooredoo` | ✓ | ✓ | ✓ | `normal` only |
+| [SMS Misr](https://smsmisr.com/) | `smsmisr` | ✓ | ✓ | ✓ | `normal` or `otp` (the package's code is sent through the OTP endpoint) |
+| [Victory Link](https://victorylink.com/) | `victorylink` | ✓ | ✓ | ✓ | `normal` only |
+| [Ooredoo Qatar](https://www.ooredoo.qa/) | `ooredoo` | ✓ | ✓ | ✓ | `normal` only |
 | Null (sending turned off) | `null` | — | — | — | — |
+
+Phone numbers are sent to the gateway unchanged, so pass them in the format your gateway expects. SMS EG and SMS Misr document numbers in international format without `+` or leading zeros, for example `201000000000` for an Egyptian mobile number. For Victory Link and Ooredoo, check the format with your account manager.
 
 Need another gateway? See [Adding custom drivers](#adding-custom-drivers).
 
@@ -98,16 +102,16 @@ Send a message, or send a code and check it:
 ``` php
 use Shabayek\Sms\Facade\Sms;
 
-$result = Sms::send('0120000000', 'Hello world');
+$result = Sms::send('201000000000', 'Hello world');
 
 if (! $result['success']) {
     logger()->warning('SMS not sent', $result['provider']);
 }
 
-$code = Sms::sendOtp('0120000000'); // the code that was sent, or null if it wasn't sent
+$code = Sms::sendOtp('201000000000'); // the code that was sent, or null if it wasn't sent
 
 // Later, compare the code the user typed with the one you stored:
-$valid = Sms::verify('0120000000', $request->input('otp'), $storedCode);
+$valid = Sms::verify('201000000000', $request->input('otp'), $storedCode);
 ```
 
 The sections below cover each step in detail.
@@ -147,7 +151,7 @@ SMS_SERVICE=normal
 ``` php
 use Shabayek\Sms\Facade\Sms;
 
-$sms = Sms::send('0120000000', 'Hello world');
+$sms = Sms::send('201000000000', 'Hello world');
 ```
 
 - Send otp sms message
@@ -158,7 +162,7 @@ $sms = Sms::send('0120000000', 'Hello world');
 ``` php
 use Shabayek\Sms\Facade\Sms;
 
-$sms = Sms::sendOtp('0120000000');
+$sms = Sms::sendOtp('201000000000');
 ```
 
 - Verify phone number
@@ -166,14 +170,14 @@ $sms = Sms::sendOtp('0120000000');
 ``` php
 use Shabayek\Sms\Facade\Sms;
 
-$phone = '09121234567'; // phone number
+$phone = '201000000000'; // phone number
 $otp = '123456'; // otp that you sent to phone
 $actualOtp = '123456'; // this is the actual otp that you sent to the user
 
 $verify = Sms::verify($phone, $otp, $actualOtp); // third param is optional only for SMS EG with service otp
 ```
 
-- Change the OTP message with `SMS_MESSAGE` (or `message` in `config/sms.php`). Use `{code}` where the code goes. The message can be in any language: the encoding sent to the gateway (English, Arabic or Unicode) is detected from the text.
+- Change the OTP message with `SMS_MESSAGE` (or `message` in `config/sms.php`). Use `{code}` where the code goes. A message without `{code}` makes `sendOtp()` throw an `InvalidArgumentException` before anything is sent. The message can be in any language: the encoding sent to the gateway (English, Arabic or Unicode) is detected from the text.
 
 ``` php
 SMS_MESSAGE="Your verification code is: {code}"
@@ -204,7 +208,7 @@ SMS_MESSAGE="Your verification code is: {code}"
 use Shabayek\Sms\Enums\ResponseCode;
 use Shabayek\Sms\Facade\Sms;
 
-$result = Sms::send('0120000000', 'Hello world');
+$result = Sms::send('201000000000', 'Hello world');
 
 if ($result['code'] === ResponseCode::Rejected) {
     logger()->warning('SMS rejected', $result['provider']);
@@ -228,7 +232,7 @@ Check `code` rather than `message` in your application. The case serializes to i
 - `sendOtp()` returns the generated code when the request is treated as sent, and `null` when it is not (rejected by the gateway, unexpected response, or the `null` driver). Check for `null` before storing the code: passing `null` to `verify()` as the actual otp throws an exception.
 
 ``` php
-$code = Sms::sendOtp('0120000000');
+$code = Sms::sendOtp('201000000000');
 
 if ($code === null) {
     // not sent: show an error or let the user retry
@@ -249,6 +253,26 @@ if ($code === null) {
 - **SMS Misr:** `send()` reports success only for an HTTP 2xx response with code `1901`. With service **otp**, the `vSMS` response body is not interpreted, because its format has not been verified. Any HTTP 2xx response counts as sent, so `sendOtp()` can return a code even when SMS Misr rejected the request inside a 200 response.
 
 See [CHANGELOG.md](CHANGELOG.md) for upgrade notes.
+
+## Your application's responsibilities
+
+The package sends codes and compares them. Your application handles the rest:
+
+- **Expiry:** store the code with a timestamp, and reject it after a few minutes.
+- **Attempts:** limit how many times a code can be checked, then discard it.
+- **Sending limits:** throttle `sendOtp()` per phone number and per IP address, for example with Laravel's `RateLimiter`. Every message costs money, and repeated sends can be abused.
+- **Storage:** keep the code on the server (cache or database), never in a form field or cookie the user can read.
+- **Logging:** the package removes request details from transport error messages, but Laravel's HTTP client events and tools that record requests, such as Telescope, still see the full request. Several gateways put the username, password, phone number and message text in the URL, so keep those tools off in production or filter what they record.
+- **Stack traces:** with `zend.exception_ignore_args=Off`, stack traces show function arguments, such as the phone number and the code passed to `verify()`. Keep `zend.exception_ignore_args=On` (the production default in `php.ini-production`) or scrub traces before sending them to an error tracker.
+- **Base URL:** a malformed `base_url` (Ooredoo) makes Guzzle throw an "Unable to parse URI" error that contains the URL. Don't put credentials in it.
+
+## Balance
+
+`balance()` returns the credit the gateway reports. Some failures can't be told apart from a real balance yet:
+
+- **SMS EG and SMS Misr:** return `0` when the gateway answers with an error or an unexpected response, so `0` doesn't always mean an empty account.
+- **Victory Link:** returns the gateway's value as-is. Victory Link documents `-1` as invalid credentials and `0` as unlimited credit.
+- **Ooredoo:** throws an exception when the response has no credit information.
 
 ## Adding custom drivers
 

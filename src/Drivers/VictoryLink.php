@@ -23,7 +23,7 @@ class VictoryLink extends Driver implements SmsGatewayContract
      */
     public function __construct(array $config)
     {
-        parent::__construct($config['username'], $config['password'], $config['sender_id']);
+        parent::__construct($config['username'] ?? null, $config['password'] ?? null, $config['sender_id'] ?? null);
     }
 
     /**

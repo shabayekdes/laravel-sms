@@ -28,7 +28,7 @@ description: The structured result returned by send() and how to customize its m
 use Shabayek\Sms\Enums\ResponseCode;
 use Shabayek\Sms\Facade\Sms;
 
-$result = Sms::send('0120000000', 'Hello world');
+$result = Sms::send('201000000000', 'Hello world');
 
 if ($result['code'] === ResponseCode::Rejected) {
     logger()->warning('SMS rejected', $result['provider']);

@@ -5,6 +5,8 @@ namespace Shabayek\Sms\Tests\Feature;
 use ErrorException;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Shabayek\Sms\Facade\Sms;
 use Shabayek\Sms\Tests\TestCase;
 
@@ -21,6 +23,7 @@ use Shabayek\Sms\Tests\TestCase;
 class BalanceTest extends TestCase
 {
     /** @test */
+    #[Test]
     public function smseg_returns_the_points_from_the_response()
     {
         $this->stubHttp([
@@ -36,6 +39,7 @@ class BalanceTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function smseg_returns_zero_for_an_error_response()
     {
         $this->stubHttp([
@@ -46,6 +50,7 @@ class BalanceTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function smseg_currently_returns_zero_for_a_server_error()
     {
         $this->stubHttp([
@@ -56,6 +61,7 @@ class BalanceTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function smsmisr_returns_the_balance_from_the_response()
     {
         $this->stubHttp([
@@ -71,6 +77,7 @@ class BalanceTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function smsmisr_returns_zero_for_an_error_code()
     {
         $this->stubHttp([
@@ -81,6 +88,7 @@ class BalanceTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function smsmisr_currently_returns_zero_for_a_server_error()
     {
         $this->stubHttp([
@@ -95,6 +103,8 @@ class BalanceTest extends TestCase
      *
      * @dataProvider victoryLinkCredits
      */
+    #[Test]
+    #[DataProvider('victoryLinkCredits')]
     public function victorylink_returns_the_credit_value_as_is($value, $expected)
     {
         $this->stubHttp([
@@ -116,6 +126,7 @@ class BalanceTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function victorylink_currently_throws_for_a_body_that_is_not_xml()
     {
         $this->stubHttp([
@@ -128,6 +139,7 @@ class BalanceTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function ooredoo_returns_the_sms_credit_from_several_pairs()
     {
         $this->stubOoredooCredits('<CreditPair><Type>MMS</Type><Value>3</Value></CreditPair><CreditPair><Type>SMS</Type><Value>50</Value></CreditPair>');
@@ -136,6 +148,7 @@ class BalanceTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function ooredoo_returns_the_sms_credit_from_a_single_pair()
     {
         $this->stubOoredooCredits('<CreditPair><Type>SMS</Type><Value>50</Value></CreditPair>');
@@ -144,6 +157,7 @@ class BalanceTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function ooredoo_returns_zero_without_an_sms_credit()
     {
         $this->stubOoredooCredits('<CreditPair><Type>MMS</Type><Value>3</Value></CreditPair>');
@@ -152,6 +166,7 @@ class BalanceTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function ooredoo_currently_returns_a_negative_credit_as_positive()
     {
         $this->stubOoredooCredits('<CreditPair><Type>SMS</Type><Value>-20</Value></CreditPair>');
@@ -160,6 +175,7 @@ class BalanceTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function ooredoo_currently_throws_when_the_response_has_no_credits()
     {
         $this->stubHttp([

@@ -7,11 +7,10 @@ return [
     | Default SMS Connection Name
     |--------------------------------------------------------------------------
     |
-    | Here you may specify which of the sms connections gateway below you wish
-    | to use as your default connection for all companies work. Of course
+    | The connection below that the Sms facade uses by default.
     |
-    | Supported companies: "smseg", "smsmisr", "victorylink", "ooredoo", "null"
-    | if you choosing null, sms will be disabled
+    | Supported: "smseg", "smsmisr", "victorylink", "ooredoo", "null"
+    | Choose "null" to turn sending off.
     |
     */
 
@@ -30,7 +29,7 @@ return [
 
         /*
         |--------------------------------------------------------------------------
-        | Sms EG Connection
+        | SMS EG Connection
         |--------------------------------------------------------------------------
         |
         | Here are credentials for sms eg gateway. Of course There are
@@ -50,7 +49,7 @@ return [
 
         /*
         |--------------------------------------------------------------------------
-        | Sms EG Connection
+        | SMS Misr Connection
         |--------------------------------------------------------------------------
         |
         | Here are credentials for sms misr gateway. Of course There are
@@ -73,7 +72,7 @@ return [
 
         /*
         |--------------------------------------------------------------------------
-        | Sms EG Connection
+        | Victory Link Connection
         |--------------------------------------------------------------------------
         |
         | Here are credentials for sms victory link gateway.
@@ -114,6 +113,7 @@ return [
     |
     | The message sent with the otp code. Put your custom message here and
     | use the keyword {code} to replace it with the verification code.
+    | A message without {code} makes sendOtp() throw before sending.
     | The encoding sent to the gateway is detected from the text.
     |
     */

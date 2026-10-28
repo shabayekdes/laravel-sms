@@ -2,6 +2,32 @@
 
 All notable changes to `shabayek/laravel-sms` are documented in this file.
 
+## Unreleased
+
+### Fixed
+
+- `sendOtp()` throws `InvalidArgumentException` and sends nothing when the `message` template has no `{code}` placeholder. Previously it sent an OTP message without the code.
+- Drivers no longer crash with `Undefined array key` when a published config from an older version lacks a connection key, such as `service`, `token` or `customer_id`. A missing `service` defaults to `normal`, and a missing Ooredoo `base_url` defaults to the Ooredoo endpoint.
+- Ooredoo `send()` sends the `blink`, `flash` and `Private` flags as `false` instead of `0`, which the gateway's boolean parameters may reject.
+
+### Changed
+
+- `composer.json` declares the Illuminate packages the package uses: `illuminate/http` and `illuminate/support` 8.83 or later, up to 13.x.
+- Tests, CI configuration and other development files are left out of the Composer dist archive.
+- CI tests every supported Laravel version, 8 through 13, with the PHP versions each one supports.
+- The manager is registered as a singleton and can be injected by class: type-hint `Shabayek\Sms\SmsManager`. `app('sms')`, the `Sms` facade and the injected instance are the same object, so creators registered with `extend()` on one are visible on the others.
+- Tests include response fixtures built from the SMS EG, SMS Misr and Ooredoo documentation.
+
+### Documentation
+
+- The phone number format each gateway expects, what `balance()` returns when a gateway can't report a balance, and what the application is responsible for with OTP codes (expiry, attempt and send limits, storage, and request logging).
+- Fixed the SMS Misr and Victory Link links and the section titles in `config/sms.php`.
+- Request data that can still leak outside transport error messages: function arguments in stack traces, and a malformed `base_url` in Guzzle's error.
+
+### Upgrade notes
+
+- If `SMS_MESSAGE` (or `message` in a published config) has no `{code}` placeholder, `sendOtp()` now throws `InvalidArgumentException` instead of sending a message without the code. Add `{code}` to the message.
+
 ## v3.0 - 2026-10-28
 
 This is a major release: it requires PHP 8.1, adds response codes to `send()` results and removes `setLanguage()`. Read the upgrade notes before updating from 2.x.

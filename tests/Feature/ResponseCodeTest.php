@@ -4,6 +4,8 @@ namespace Shabayek\Sms\Tests\Feature;
 
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Shabayek\Sms\Enums\ResponseCode;
 use Shabayek\Sms\Facade\Sms;
 use Shabayek\Sms\Tests\TestCase;
@@ -22,6 +24,8 @@ class ResponseCodeTest extends TestCase
      *
      * @dataProvider sendResponses
      */
+    #[Test]
+    #[DataProvider('sendResponses')]
     public function it_returns_a_response_code_for_each_gateway_answer($driver, $url, $response, $code, $providerCode, $providerMessage)
     {
         $this->stubHttp([$url => Http::response(...$response)]);
@@ -34,7 +38,7 @@ class ResponseCodeTest extends TestCase
         $this->assertSame(['code' => $providerCode, 'message' => $providerMessage], $sms['provider']);
     }
 
-    public function sendResponses(): array
+    public static function sendResponses(): array
     {
         $smsmisr = 'smsmisr.com/api/v2';
         $smseg = 'smssmartegypt.com/sms/api/?*';
@@ -62,6 +66,7 @@ class ResponseCodeTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function the_null_driver_returns_the_disabled_code()
     {
         $sms = Sms::driver('null')->send('0123456789', 'test message');
@@ -72,6 +77,7 @@ class ResponseCodeTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_uses_the_configured_message_for_a_code()
     {
         config()->set('sms.messages.rejected', 'The gateway refused the message');
@@ -87,6 +93,7 @@ class ResponseCodeTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_falls_back_to_the_default_message_when_a_code_is_not_configured()
     {
         config()->set('sms.messages', []);
@@ -97,6 +104,7 @@ class ResponseCodeTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function the_code_serializes_to_its_string_value()
     {
         $sms = Sms::driver('null')->send('0123456789', 'test message');
@@ -106,6 +114,7 @@ class ResponseCodeTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_sends_an_arabic_otp_message_as_arabic()
     {
         config()->set('sms.message', 'كود التحقق الخاص بك هو: {code}');
@@ -126,6 +135,8 @@ class ResponseCodeTest extends TestCase
      *
      * @dataProvider encodings
      */
+    #[Test]
+    #[DataProvider('encodings')]
     public function it_detects_the_encoding_from_the_message_text($driver, $url, $response, $field, $text, $expected)
     {
         $this->stubHttp([$url => Http::response(...$response)]);
@@ -137,7 +148,7 @@ class ResponseCodeTest extends TestCase
         });
     }
 
-    public function encodings(): array
+    public static function encodings(): array
     {
         $smsmisr = ['smsmisr', 'smsmisr.com/api/v2', [['code' => 1901], 200], 'language'];
         $victorylink = ['victorylink', 'smsvas.vlserv.com/KannelSending/service.asmx/SendSMS*', [self::XML.'<int>0</int>', 200], 'SMSLang'];

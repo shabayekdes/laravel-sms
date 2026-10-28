@@ -3,6 +3,7 @@
 namespace Shabayek\Sms\Tests\Unit;
 
 use Illuminate\Support\Facades\Facade;
+use PHPUnit\Framework\Attributes\Test;
 use Shabayek\Sms\Tests\TestCase;
 
 /**
@@ -13,6 +14,7 @@ use Shabayek\Sms\Tests\TestCase;
 class ComposerAliasTest extends TestCase
 {
     /** @test */
+    #[Test]
     public function it_points_every_alias_to_an_existing_facade()
     {
         $composer = json_decode(file_get_contents(__DIR__.'/../../composer.json'), true);

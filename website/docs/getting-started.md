@@ -61,16 +61,16 @@ Some gateways need extra settings. See [Supported gateways](./gateways.md) for t
 ```php
 use Shabayek\Sms\Facade\Sms;
 
-$result = Sms::send('0120000000', 'Hello world');
+$result = Sms::send('201000000000', 'Hello world');
 
 if (! $result['success']) {
     logger()->warning('SMS not sent', $result['provider']);
 }
 
-$code = Sms::sendOtp('0120000000'); // the code that was sent, or null if it wasn't sent
+$code = Sms::sendOtp('201000000000'); // the code that was sent, or null if it wasn't sent
 
 // Later, compare the code the user typed with the one you stored:
-$valid = Sms::verify('0120000000', $request->input('otp'), $storedCode);
+$valid = Sms::verify('201000000000', $request->input('otp'), $storedCode);
 ```
 
 Next steps:

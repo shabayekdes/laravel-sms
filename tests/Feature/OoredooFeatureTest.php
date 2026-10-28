@@ -2,7 +2,10 @@
 
 namespace Shabayek\Sms\Tests\Feature;
 
+use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Shabayek\Sms\Drivers\Ooredoo;
 use Shabayek\Sms\Facade\Sms;
 use Shabayek\Sms\Tests\TestCase;
@@ -11,12 +14,14 @@ use Shabayek\Sms\Tests\TestCase;
  * OoredooFeatureTest class.
  *
  * The XML fixtures follow the shape the driver parses, not provider docs.
+ * Fixtures built from the documentation are in DocumentedResponseTest.
  *
  * @author Esmail Shabayek <esmail.shabayek@gmail.com>
  */
 class OoredooFeatureTest extends TestCase
 {
     /** @test */
+    #[Test]
     public function it_returns_the_code_when_the_otp_message_is_accepted()
     {
         $this->stubHttp([
@@ -27,6 +32,7 @@ class OoredooFeatureTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_returns_null_when_the_otp_message_is_rejected()
     {
         $this->stubHttp([
@@ -41,6 +47,8 @@ class OoredooFeatureTest extends TestCase
      *
      * @dataProvider unconfirmedResponses
      */
+    #[Test]
+    #[DataProvider('unconfirmedResponses')]
     public function it_does_not_report_success_without_provider_confirmation($body, $status)
     {
         $this->stubHttp([
@@ -58,6 +66,8 @@ class OoredooFeatureTest extends TestCase
      *
      * @dataProvider unconfirmedResponses
      */
+    #[Test]
+    #[DataProvider('unconfirmedResponses')]
     public function it_returns_null_when_the_otp_message_is_not_confirmed($body, $status)
     {
         $this->stubHttp([
@@ -65,6 +75,25 @@ class OoredooFeatureTest extends TestCase
         ]);
 
         $this->assertNull($this->driver()->sendOtp('0123456789'));
+    }
+
+    /** @test */
+    #[Test]
+    public function it_sends_boolean_flags_as_literal_strings()
+    {
+        $this->stubHttp([
+            'ooredoo.test/Messenger.asmx/HTTP_SendSms*' => Http::response('<?xml version="1.0" encoding="utf-8"?><SendResult><Result>OK</Result></SendResult>', 200),
+        ]);
+
+        $this->driver()->send('0123456789', 'test message');
+
+        Http::assertSent(function (Request $request) {
+            parse_str(parse_url($request->url(), PHP_URL_QUERY), $query);
+
+            return $query['blink'] === 'false'
+                && $query['flash'] === 'false'
+                && $query['Private'] === 'false';
+        });
     }
 
     public static function unconfirmedResponses(): array

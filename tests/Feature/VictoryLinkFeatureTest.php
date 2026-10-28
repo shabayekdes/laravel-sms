@@ -3,6 +3,8 @@
 namespace Shabayek\Sms\Tests\Feature;
 
 use Illuminate\Support\Facades\Http;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Shabayek\Sms\Facade\Sms;
 use Shabayek\Sms\Tests\TestCase;
 
@@ -14,6 +16,7 @@ use Shabayek\Sms\Tests\TestCase;
 class VictoryLinkFeatureTest extends TestCase
 {
     /** @test */
+    #[Test]
     public function it_can_victory_link_send_sms_message_successfully()
     {
         $this->setConfig('victorylink');
@@ -40,6 +43,7 @@ class VictoryLinkFeatureTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function test_victory_link_not_sent_message()
     {
         $this->setConfig('victorylink');
@@ -66,6 +70,7 @@ class VictoryLinkFeatureTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_returns_the_code_when_the_otp_message_is_accepted()
     {
         $this->setConfig('victorylink');
@@ -78,6 +83,7 @@ class VictoryLinkFeatureTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_returns_null_when_the_otp_message_is_rejected()
     {
         $this->setConfig('victorylink');
@@ -94,6 +100,8 @@ class VictoryLinkFeatureTest extends TestCase
      *
      * @dataProvider unconfirmedResponses
      */
+    #[Test]
+    #[DataProvider('unconfirmedResponses')]
     public function it_does_not_report_success_without_provider_confirmation($body, $status)
     {
         $this->setConfig('victorylink');
@@ -113,6 +121,8 @@ class VictoryLinkFeatureTest extends TestCase
      *
      * @dataProvider unconfirmedResponses
      */
+    #[Test]
+    #[DataProvider('unconfirmedResponses')]
     public function it_returns_null_when_the_otp_message_is_not_confirmed($body, $status)
     {
         $this->setConfig('victorylink');

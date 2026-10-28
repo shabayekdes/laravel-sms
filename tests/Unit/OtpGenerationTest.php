@@ -3,6 +3,8 @@
 namespace Shabayek\Sms\Tests\Unit;
 
 use Illuminate\Support\Facades\Http;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Shabayek\Sms\Facade\Sms;
 use Shabayek\Sms\Tests\TestCase;
 
@@ -29,6 +31,8 @@ class OtpGenerationTest extends TestCase
      *
      * @dataProvider developmentEnvironments
      */
+    #[Test]
+    #[DataProvider('developmentEnvironments')]
     public function it_uses_the_development_code_in_local_and_testing($environment)
     {
         $this->app['env'] = $environment;
@@ -41,6 +45,8 @@ class OtpGenerationTest extends TestCase
      *
      * @dataProvider nonDevelopmentEnvironments
      */
+    #[Test]
+    #[DataProvider('nonDevelopmentEnvironments')]
     public function it_generates_a_six_digit_code_outside_local_and_testing($environment)
     {
         $this->app['env'] = $environment;
@@ -59,6 +65,7 @@ class OtpGenerationTest extends TestCase
      *
      * @test
      */
+    #[Test]
     public function it_does_not_derive_codes_from_the_seedable_mt_rand_generator()
     {
         $this->app['env'] = 'production';
