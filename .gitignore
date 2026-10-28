@@ -29,3 +29,9 @@ Homestead.json
 /audit_review/
 /provider_audit/
 /ROADMAP.md
+
+# Docs site
+/website/node_modules/
+/website/build/
+/website/.docusaurus/
+/website/docs/changelog.md
