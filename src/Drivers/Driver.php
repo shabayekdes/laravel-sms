@@ -7,6 +7,8 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\TooManyRedirectsException;
 use GuzzleHttp\Psr7\Request;
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Psr\Http\Message\RequestInterface;
 use Shabayek\Sms\Enums\Service;
@@ -153,6 +155,8 @@ abstract class Driver
      * message that only names the gateway host, a request without query or
      * body, and no previous exception, since that would carry the original.
      *
+     * The callback receives a pending request with the configured timeouts.
+     *
      * @param  callable  $request
      * @return \Illuminate\Http\Client\Response
      *
@@ -162,7 +166,7 @@ abstract class Driver
     protected function sendSafely(callable $request)
     {
         try {
-            return $request();
+            return $request($this->pendingRequest());
         } catch (ConnectionException $e) {
             throw new ConnectionException($this->transportErrorMessage($e->getPrevious()));
         } catch (RequestException $e) {
@@ -170,6 +174,19 @@ abstract class Driver
 
             throw new $class($this->transportErrorMessage($e), $this->redactRequest($e->getRequest()));
         }
+    }
+
+    /**
+     * Create a gateway request with the configured timeouts.
+     *
+     * A timeout of 0 waits indefinitely, as Guzzle does by default.
+     *
+     * @return \Illuminate\Http\Client\PendingRequest
+     */
+    private function pendingRequest(): PendingRequest
+    {
+        return Http::timeout((int) config('sms.timeout', 30))
+            ->withOptions(['connect_timeout' => (int) config('sms.connect_timeout', 10)]);
     }
 
     /**

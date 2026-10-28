@@ -2,8 +2,8 @@
 
 namespace Shabayek\Sms\Drivers;
 
+use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Http;
 use Shabayek\Sms\Contracts\SmsGatewayContract;
 use Shabayek\Sms\Enums\Service;
 
@@ -115,8 +115,8 @@ class SmsEg extends Driver implements SmsGatewayContract
             'username' => $this->username,
             'password' => $this->password,
         ];
-        $response = $this->sendSafely(function () use ($params) {
-            return Http::get($this->base_url.'/getBalance?'.http_build_query($params));
+        $response = $this->sendSafely(function (PendingRequest $http) use ($params) {
+            return $http->get($this->base_url.'/getBalance?'.http_build_query($params));
         });
         $result = $response->json();
 
@@ -144,8 +144,8 @@ class SmsEg extends Driver implements SmsGatewayContract
             'message' => $message,
         ];
 
-        return $this->sendSafely(function () use ($params) {
-            return Http::get($this->base_url.'/?'.http_build_query($params));
+        return $this->sendSafely(function (PendingRequest $http) use ($params) {
+            return $http->get($this->base_url.'/?'.http_build_query($params));
         });
     }
 
@@ -164,8 +164,8 @@ class SmsEg extends Driver implements SmsGatewayContract
             'mobile' => $phone,
             'lang' => 'ar',
         ];
-        $this->sendSafely(function () use ($params) {
-            return Http::post($this->base_url.'/otp-send', $params);
+        $this->sendSafely(function (PendingRequest $http) use ($params) {
+            return $http->post($this->base_url.'/otp-send', $params);
         });
     }
 
@@ -185,8 +185,8 @@ class SmsEg extends Driver implements SmsGatewayContract
             'otp' => $otp,
             'verify' => true,
         ];
-        $response = $this->sendSafely(function () use ($params) {
-            return Http::post($this->base_url.'/otp-check', $params);
+        $response = $this->sendSafely(function (PendingRequest $http) use ($params) {
+            return $http->post($this->base_url.'/otp-check', $params);
         });
 
         $result = $response->json();

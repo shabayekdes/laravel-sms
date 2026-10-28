@@ -2,7 +2,7 @@
 
 namespace Shabayek\Sms\Drivers;
 
-use Illuminate\Support\Facades\Http;
+use Illuminate\Http\Client\PendingRequest;
 use Shabayek\Sms\Contracts\SmsGatewayContract;
 
 /**
@@ -75,8 +75,8 @@ class VictoryLink extends Driver implements SmsGatewayContract
             'Password' => $this->password,
         ];
 
-        $response = $this->sendSafely(function () use ($params) {
-            return Http::get($this->base_url.'/CheckCredit?'.http_build_query($params));
+        $response = $this->sendSafely(function (PendingRequest $http) use ($params) {
+            return $http->get($this->base_url.'/CheckCredit?'.http_build_query($params));
         });
 
         $xml = simplexml_load_string($response->body());
@@ -103,8 +103,8 @@ class VictoryLink extends Driver implements SmsGatewayContract
             'SMSText' => $message,
         ];
 
-        $response = $this->sendSafely(function () use ($params) {
-            return Http::get($this->base_url.'/SendSMS?'.http_build_query($params));
+        $response = $this->sendSafely(function (PendingRequest $http) use ($params) {
+            return $http->get($this->base_url.'/SendSMS?'.http_build_query($params));
         });
 
         if (! $response->successful()) {

@@ -13,6 +13,10 @@ All notable changes to `shabayek/laravel-sms` are documented in this file.
 - The fixed development code `1234` is only used in the `local` and `testing` environments. Previously it was used in every environment not named exactly `production`, including `staging`, `prod` and `uat`.
 - Transport failures no longer expose request details. Guzzle ends cURL error messages with the full request URL, which for several drivers holds the username, password, phone number, message text and otp code, so a timeout could write them to the application log. Every driver now rethrows these errors as the same exception type (`Illuminate\Http\Client\ConnectionException`, or Guzzle's `RequestException` / `TooManyRedirectsException` for other cURL errors) with a message that names only the gateway host and cURL error number, for example `SMS gateway request to smsmisr.com failed (cURL error 28). Request details were removed from this message.`
 
+### Added
+
+- Gateway requests time out. The new `timeout` and `connect_timeout` config values (`SMS_TIMEOUT`, `SMS_CONNECT_TIMEOUT`) default to 30 and 10 seconds; previously requests could wait indefinitely on Laravel 8. A timeout throws `Illuminate\Http\Client\ConnectionException`.
+
 ### Fixed
 
 - SMS EG and SMS Misr `send()` no longer report success for HTTP errors, empty or malformed bodies, or responses without the expected success value.
@@ -35,6 +39,7 @@ All notable changes to `shabayek/laravel-sms` are documented in this file.
 - Custom drivers extending `Shabayek\Sms\Drivers\Driver` inherit a new protected `isValidOtp()` method that `verify()` uses. A subclass that already defines a method with that name replaces this validation with its own.
 - Transport exceptions thrown by the drivers no longer chain the original exception, so `getPrevious()` returns `null` and the Guzzle handler context is gone. Guzzle `RequestException`s carry a copy of the request without query string, headers or body, and no response. Code that parsed the old message or read these details needs updating.
 - Custom drivers extending `Shabayek\Sms\Drivers\Driver` inherit a new protected `sendSafely()` method. A subclass that already defines a method with that name must keep a compatible signature.
+- Gateway requests that take longer than 30 seconds (10 seconds to connect) now fail with a `ConnectionException`. Raise `SMS_TIMEOUT` / `SMS_CONNECT_TIMEOUT`, or set them to `0` to wait indefinitely as before. Published config files don't need the new keys; the defaults apply. A timed-out request may still have been accepted by the gateway, so don't resend automatically.
 
 ### Known limitations
 

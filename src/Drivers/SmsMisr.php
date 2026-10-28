@@ -2,8 +2,8 @@
 
 namespace Shabayek\Sms\Drivers;
 
+use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Http;
 use Shabayek\Sms\Contracts\SmsGatewayContract;
 use Shabayek\Sms\Enums\Service;
 
@@ -110,8 +110,8 @@ class SmsMisr extends Driver implements SmsGatewayContract
             'request' => 'status',
         ];
 
-        $response = $this->sendSafely(function () use ($params) {
-            return Http::post($this->base_url.'/Request?'.http_build_query($params));
+        $response = $this->sendSafely(function (PendingRequest $http) use ($params) {
+            return $http->post($this->base_url.'/Request?'.http_build_query($params));
         });
         $result = $response->json();
 
@@ -144,8 +144,8 @@ class SmsMisr extends Driver implements SmsGatewayContract
             'Code' => $code,
         ];
 
-        return $this->sendSafely(function () use ($params) {
-            return Http::post($this->base_url.'/vSMS', $params);
+        return $this->sendSafely(function (PendingRequest $http) use ($params) {
+            return $http->post($this->base_url.'/vSMS', $params);
         })->successful();
     }
 
@@ -168,8 +168,8 @@ class SmsMisr extends Driver implements SmsGatewayContract
             'DelayUntil' => null,
         ];
 
-        return $this->sendSafely(function () use ($params) {
-            return Http::post($this->base_url.'/v2', $params);
+        return $this->sendSafely(function (PendingRequest $http) use ($params) {
+            return $http->post($this->base_url.'/v2', $params);
         });
     }
 

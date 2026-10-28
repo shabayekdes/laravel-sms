@@ -135,4 +135,20 @@ return [
         'en' => env('SMS_MESSAGE', 'Your verification code is: {code}'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Gateway Request Timeouts
+    |--------------------------------------------------------------------------
+    |
+    | The maximum number of seconds to wait for a gateway to connect and to
+    | answer a request. A timed out request throws a ConnectionException.
+    | The gateway may still have accepted the message, so do not resend
+    | automatically. Set a value to 0 to wait indefinitely.
+    |
+    */
+
+    'timeout' => env('SMS_TIMEOUT', 30),
+
+    'connect_timeout' => env('SMS_CONNECT_TIMEOUT', 10),
+
 ];

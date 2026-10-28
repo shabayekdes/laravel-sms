@@ -23,6 +23,8 @@ class EnvironmentIsolationFeatureTest extends TestCase
         'SMS_PASSWORD' => 'env-password',
         'SMS_SENDER_ID' => 'EnvSender',
         'SMS_SERVICE' => 'otp',
+        'SMS_TIMEOUT' => '1',
+        'SMS_CONNECT_TIMEOUT' => '1',
     ];
 
     protected function setUp(): void
@@ -54,6 +56,8 @@ class EnvironmentIsolationFeatureTest extends TestCase
         $this->assertSame('Your verification code is: {code}', config('sms.message.en'));
         $this->assertSame(self::TEST_USERNAME, config('sms.connections.smseg.username'));
         $this->assertSame('normal', config('sms.connections.smseg.service'));
+        $this->assertSame(30, config('sms.timeout'));
+        $this->assertSame(10, config('sms.connect_timeout'));
     }
 
     /** @test */

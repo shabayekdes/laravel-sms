@@ -45,8 +45,8 @@ abstract class TestCase extends Orchestra
 
         $this->httpStubs = [];
 
-        Http::fake(function (Request $request) {
-            return $this->resolveHttpStub($request);
+        Http::fake(function (Request $request, array $options) {
+            return $this->resolveHttpStub($request, $options);
         });
     }
 
@@ -78,6 +78,8 @@ abstract class TestCase extends Orchestra
         $app['config']->set('sms.language', 'ar');
         $app['config']->set('sms.message.ar', 'كود التحقق الخاص بك هو: {code}');
         $app['config']->set('sms.message.en', 'Your verification code is: {code}');
+        $app['config']->set('sms.timeout', 30);
+        $app['config']->set('sms.connect_timeout', 10);
 
         foreach (['smseg', 'smsmisr', 'victorylink', 'ooredoo'] as $connection) {
             $app['config']->set("sms.connections.{$connection}.username", self::TEST_USERNAME);
@@ -97,6 +99,8 @@ abstract class TestCase extends Orchestra
     /**
      * Register fake responses for url patterns ("*" is a wildcard).
      *
+     * A closure stub receives the request and the Guzzle request options.
+     *
      * @param  array  $stubs
      * @return void
      */
@@ -111,15 +115,16 @@ abstract class TestCase extends Orchestra
      * Resolve the fake response for a request or fail the test.
      *
      * @param  \Illuminate\Http\Client\Request  $request
+     * @param  array  $options
      * @return mixed
      *
      * @throws \RuntimeException
      */
-    private function resolveHttpStub(Request $request)
+    private function resolveHttpStub(Request $request, array $options)
     {
         foreach ($this->httpStubs as $url => $response) {
             if (Str::is(Str::start($url, '*'), $request->url())) {
-                return $response instanceof Closure ? $response($request) : $response;
+                return $response instanceof Closure ? $response($request, $options) : $response;
             }
         }
 

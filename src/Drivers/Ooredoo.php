@@ -2,7 +2,7 @@
 
 namespace Shabayek\Sms\Drivers;
 
-use Illuminate\Support\Facades\Http;
+use Illuminate\Http\Client\PendingRequest;
 use Shabayek\Sms\Contracts\SmsGatewayContract;
 
 /**
@@ -78,8 +78,8 @@ class Ooredoo extends Driver implements SmsGatewayContract
             'userPassword' => $this->password,
         ];
 
-        $response = $this->sendSafely(function () use ($params) {
-            return Http::get($this->base_url.'/HTTP_Authenticate2?'.http_build_query($params));
+        $response = $this->sendSafely(function (PendingRequest $http) use ($params) {
+            return $http->get($this->base_url.'/HTTP_Authenticate2?'.http_build_query($params));
         });
 
         $response = simplexml_load_string($response->body());
@@ -115,8 +115,8 @@ class Ooredoo extends Driver implements SmsGatewayContract
             'Private' => false,
         ];
 
-        $response = $this->sendSafely(function () use ($params) {
-            return Http::get($this->base_url.'/HTTP_SendSms?'.http_build_query($params));
+        $response = $this->sendSafely(function (PendingRequest $http) use ($params) {
+            return $http->get($this->base_url.'/HTTP_SendSms?'.http_build_query($params));
         });
 
         if (! $response->successful()) {
