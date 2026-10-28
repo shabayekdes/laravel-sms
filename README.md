@@ -1,23 +1,110 @@
-# Laravel SMS
+<p align="center">
+  <a href="https://github.com/shabayekdes/laravel-sms">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="assets/branding/logo-dark.svg">
+      <img src="assets/branding/logo.svg" alt="Laravel SMS" height="72">
+    </picture>
+  </a>
+</p>
 
-[![Github Status](https://github.com/shabayekdes/laravel-sms/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/shabayekdes/laravel-sms/actions) [![Styleci Status](https://github.styleci.io/repos/481996033/shield?style=flat&branch=develop)](https://github.styleci.io/repos/421966331) [![Packagist version](https://img.shields.io/packagist/v/shabayek/laravel-sms)](https://packagist.org/packages/shabayek/laravel-sms) [![mit](https://img.shields.io/apm/l/laravel)](https://packagist.org/packages/shabayek/laravel-sms) ![Packagist PHP Version Support](https://img.shields.io/packagist/php-v/shabayek/laravel-sms) ![Packagist Downloads](https://img.shields.io/packagist/dt/shabayek/laravel-sms)
+<p align="center">
+  SMS and OTP gateway drivers for Laravel, behind one facade.
+</p>
 
-This is a Laravel Package for SMS Gateway Integration. Now Sending SMS is easy.
+<p align="center">
+  <a href="https://github.com/shabayekdes/laravel-sms/actions/workflows/tests.yml"><img src="https://github.com/shabayekdes/laravel-sms/actions/workflows/tests.yml/badge.svg?branch=main" alt="Tests"></a>
+  <a href="https://github.styleci.io/repos/481996033"><img src="https://github.styleci.io/repos/481996033/shield?style=flat&branch=main" alt="StyleCI"></a>
+  <a href="https://packagist.org/packages/shabayek/laravel-sms"><img src="https://img.shields.io/packagist/v/shabayek/laravel-sms" alt="Latest version on Packagist"></a>
+  <a href="https://packagist.org/packages/shabayek/laravel-sms"><img src="https://img.shields.io/packagist/php-v/shabayek/laravel-sms" alt="PHP version"></a>
+  <a href="https://packagist.org/packages/shabayek/laravel-sms"><img src="https://img.shields.io/packagist/dt/shabayek/laravel-sms" alt="Total downloads"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/packagist/l/shabayek/laravel-sms" alt="License"></a>
+</p>
 
-### List of supported gateways:
-- [x] [SMS EG](https://www.smseg.com/en)
-- [x] [SMS Misr](https://www.sms.com.eg/website)
-- [x] [Victory Link](http://www.victorylink.com/)
-- [x] [Ooredoo](https://www.ooredoo.com/en/)
-- [ ] ...
+---
 
+Laravel SMS sends text messages and one-time passwords through several SMS gateways from one `Sms` facade. You switch gateways in config, get structured results from every send, and can register your own drivers.
 
-## Install
-Via Composer
+## Contents
+
+- [Features](#features)
+- [Supported gateways](#supported-gateways)
+- [Installation](#installation)
+- [Quick start](#quick-start)
+- [Usage](#usage)
+- [Response codes](#response-codes)
+- [OTP results and verification](#otp-results-and-verification)
+- [Gateway response notes](#gateway-response-notes)
+- [Adding custom drivers](#adding-custom-drivers)
+- [Testing](#testing)
+- [Contributing](#contributing)
+- [Security vulnerabilities](#security-vulnerabilities)
+- [License](#license)
+
+## Features
+
+- **One API for every gateway:** `send()`, `sendOtp()`, `verify()` and `balance()` work the same way on every driver.
+- **Several connections:** set a default in config and pick another one at runtime with `Sms::driver('…')`.
+- **OTP built in:** codes are generated with `random_int()` and checked with `hash_equals()`. SMS EG can also generate and check the code on the gateway.
+- **Structured results:** `send()` returns a `ResponseCode` enum, a message you can change in config, and the gateway's own code and message.
+- **Encoding detection:** the package picks English, Arabic or Unicode encoding from the message text.
+- **Timeouts and safe errors:** request and connect timeouts are configurable. Transport errors never include credentials, phone numbers or codes.
+- **`null` driver:** turns sending off in local and test environments.
+- **Custom drivers:** add your own gateway with `Sms::extend()`.
+
+## Supported gateways
+
+| Gateway | Connection | `send` | `sendOtp` | `balance` | OTP service |
+| --- | --- | :---: | :---: | :---: | --- |
+| [SMS EG](https://www.smseg.com/en) | `smseg` | ✓ | ✓ | ✓ | `normal` or `otp` (the gateway generates and checks the code) |
+| [SMS Misr](https://www.sms.com.eg/website) | `smsmisr` | ✓ | ✓ | ✓ | `normal` or `otp` (the package's code is sent through the OTP endpoint) |
+| [Victory Link](http://www.victorylink.com/) | `victorylink` | ✓ | ✓ | ✓ | `normal` only |
+| [Ooredoo](https://www.ooredoo.com/en/) | `ooredoo` | ✓ | ✓ | ✓ | `normal` only |
+| Null (sending turned off) | `null` | — | — | — | — |
+
+Need another gateway? See [Adding custom drivers](#adding-custom-drivers).
+
+## Installation
+
+Requires PHP 8.1 or later.
+
+Install with Composer:
 
 ``` bash
 composer require shabayek/laravel-sms
 ```
+
+The service provider and the `Sms` facade alias are registered automatically through Laravel package discovery.
+
+## Quick start
+
+Set the connection and credentials in `.env`:
+
+``` php
+SMS_CONNECTION=smseg
+SMS_USERNAME=username
+SMS_PASSWORD=password
+SMS_SENDER_ID=sender
+SMS_SERVICE=normal
+```
+
+Send a message, or send a code and check it:
+
+``` php
+use Shabayek\Sms\Facade\Sms;
+
+$result = Sms::send('0120000000', 'Hello world');
+
+if (! $result['success']) {
+    logger()->warning('SMS not sent', $result['provider']);
+}
+
+$code = Sms::sendOtp('0120000000'); // the code that was sent, or null if it wasn't sent
+
+// Later, compare the code the user typed with the one you stored:
+$valid = Sms::verify('0120000000', $request->input('otp'), $storedCode);
+```
+
+The sections below cover each step in detail.
 
 ## Usage
 
@@ -32,8 +119,6 @@ or by tag:
 ``` bash
 php artisan vendor:publish --tag=laravel-sms
 ```
-
-The service provider and the `Sms` facade alias are registered automatically through Laravel package discovery.
 
 - Choose what gateway you would like to use for your application. Then make that as default driver so that you don't have to specify that everywhere. But, you can also use multiple gateways in a project.
 
@@ -88,7 +173,7 @@ $verify = Sms::verify($phone, $otp, $actualOtp); // third param is optional only
 SMS_MESSAGE="Your verification code is: {code}"
 ```
 
-### Response codes
+## Response codes
 
 `send()` returns an array with a `code` you can check (a `Shabayek\Sms\Enums\ResponseCode` case), a `message` you can customize, and the gateway's own code and message when it returned them:
 
@@ -132,7 +217,7 @@ Check `code` rather than `message` in your application. The case serializes to i
 ],
 ```
 
-### OTP results and verification
+## OTP results and verification
 
 - `sendOtp()` returns the generated code when the request is treated as sent, and `null` when it is not (rejected by the gateway, unexpected response, or the `null` driver). Check for `null` before storing the code: passing `null` to `verify()` as the actual otp throws an exception.
 
@@ -152,14 +237,14 @@ if ($code === null) {
 - `verify()` only accepts non-negative integers and strings of digits. Anything else (booleans, `null`, floats, spaces, values like `1.2e5`) returns `false`. The integer `123456` and the string `'123456'` match each other, but a string with a leading zero only matches the same string. Validate the input first, for example with `'otp' => 'required|digits:6'`.
 - In the `local` and `testing` environments the code is always `1234`. Every other environment gets a random 6-digit code, so make sure `APP_ENV` is neither `local` nor `testing` on any server real users can reach.
 
-### Gateway response notes
+## Gateway response notes
 
 - **SMS EG:** `send()` reports success only for an HTTP 2xx response whose `type` is `success`. This format comes from the package's own code and tests and has not been confirmed against SMS EG's API documentation.
 - **SMS Misr:** `send()` reports success only for an HTTP 2xx response with code `1901`. With service **otp**, the `vSMS` response body is not interpreted, because its format has not been verified. Any HTTP 2xx response counts as sent, so `sendOtp()` can return a code even when SMS Misr rejected the request inside a 200 response.
 
 See [CHANGELOG.md](CHANGELOG.md) for upgrade notes.
 
-### Adding Custom Drivers
+## Adding custom drivers
 
 - Writing The Driver
 
@@ -234,19 +319,22 @@ Sms::extend('custom', function ($app, array $config) {
 
 > The closure receives the application and the config of the connection being resolved. The first argument of `extend` can be the connection name (the key under **connections**) or the `driver` value of the connection; a creator registered for the connection name wins. Resolve the driver through the `Sms` facade, for example `Sms::driver('custom')`.
 
-
-### Testing
+## Testing
 
 ``` bash
 composer test
 ```
 
+## Contributing
 
-## Security Vulnerabilities
+Issues and pull requests are welcome on [GitHub](https://github.com/shabayekdes/laravel-sms). Run `composer test` before you open a pull request. Code style follows the Laravel preset and is checked by StyleCI. See [CHANGELOG.md](CHANGELOG.md) for release history and upgrade notes.
+
+## Security vulnerabilities
 
 If you've found a bug regarding security please mail [esmail.shabayek@gmail.com](mailto:esmail.shabayek@gmail.com) instead of using the issue tracker.
 
-
 ## License
 
-The Laravel SMS Gateway package is open-sourced software licensed under the [MIT license](https://github.com/shabayekdes/laravel-sms/blob/main/LICENSE).
+The Laravel SMS Gateway package is open-sourced software licensed under the [MIT license](LICENSE).
+
+<sub>Laravel is a trademark of Taylor Otwell. This is a community package and is not affiliated with or endorsed by Laravel. Brand assets are in [`assets/branding`](assets/branding/BRAND.md).</sub>
