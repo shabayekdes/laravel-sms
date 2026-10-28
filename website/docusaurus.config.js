@@ -1,10 +1,9 @@
 // @ts-check
 import { themes as prismThemes } from 'prism-react-renderer';
 
-// Canonical site URL, e.g. https://laravel-sms.pages.dev. Set DOCS_URL in the
-// Cloudflare Pages build settings; CF_PAGES_URL (the per-deployment preview
-// URL) is used when it is missing.
-const url = (process.env.DOCS_URL || process.env.CF_PAGES_URL || 'http://localhost:3000').replace(/\/$/, '');
+// Canonical site URL. Preview deployments keep it, so canonical and social
+// preview links always point at production. DOCS_URL overrides it.
+const url = (process.env.DOCS_URL || 'https://laravel-sms.pages.dev').replace(/\/$/, '');
 
 const repo = 'https://github.com/shabayekdes/laravel-sms';
 
