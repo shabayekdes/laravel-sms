@@ -40,7 +40,6 @@ class SmsMisr extends Driver implements SmsGatewayContract
     {
         $this->service = $config['service'];
 
-        $this->language = $this->getLanguage();
         $this->token = $config['token'];
         $this->msignature = $config['msignature'];
         $this->sms_id = $config['sms_id'];

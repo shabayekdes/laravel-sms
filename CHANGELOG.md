@@ -2,6 +2,12 @@
 
 All notable changes to `shabayek/laravel-sms` are documented in this file.
 
+## Unreleased
+
+### Fixed
+
+- Ooredoo `balance()` no longer throws `TypeError: Cannot access offset of type string on string` when the response contains a single credit entry.
+
 ## v2.0 - 2026-10-28
 
 This is a major release: it requires PHP 8.0 and changes behaviour that applications may rely on. Read the upgrade notes before updating from 1.x.
