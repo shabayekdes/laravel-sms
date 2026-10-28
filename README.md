@@ -12,6 +12,12 @@
 </p>
 
 <p align="center">
+  <a href="https://laravel-sms.pages.dev"><strong>Documentation</strong></a> ·
+  <a href="https://laravel-sms.pages.dev/docs/getting-started">Getting started</a> ·
+  <a href="CHANGELOG.md">Changelog</a>
+</p>
+
+<p align="center">
   <a href="https://github.com/shabayekdes/laravel-sms/actions/workflows/tests.yml"><img src="https://github.com/shabayekdes/laravel-sms/actions/workflows/tests.yml/badge.svg?branch=main" alt="Tests"></a>
   <a href="https://github.styleci.io/repos/481996033"><img src="https://github.styleci.io/repos/481996033/shield?style=flat&branch=main" alt="StyleCI"></a>
   <a href="https://packagist.org/packages/shabayek/laravel-sms"><img src="https://img.shields.io/packagist/v/shabayek/laravel-sms" alt="Latest version on Packagist"></a>
