@@ -43,6 +43,7 @@ This is a major release: it requires PHP 8.1 and changes behaviour that applicat
 - The Ooredoo and null drivers no longer create dynamic properties, which are deprecated since PHP 8.2.
 - Creators registered with `Sms::extend()` receive the application and the connection config. Previously they received `null`. A creator can now also be registered under the connection's `driver` value; one registered under the connection name still takes precedence.
 - An undefined connection reports `SMS connection [name] is not defined.` instead of `Cache store [name] is not defined.`
+- Ooredoo `balance()` no longer throws `TypeError: Cannot access offset of type string on string` when the response contains a single credit entry.
 
 ### Documentation
 

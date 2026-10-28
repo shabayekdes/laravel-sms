@@ -102,7 +102,14 @@ class Ooredoo extends Driver implements SmsGatewayContract
         $response = simplexml_load_string($response->body());
         $arr = json_decode(json_encode((array) $response), true);
 
-        $filtered = collect($arr['Credits']['CreditPair'])->filter(function ($item) {
+        $pairs = $arr['Credits']['CreditPair'];
+
+        // A single CreditPair element decodes to the pair itself, not a list.
+        if (isset($pairs['Type'])) {
+            $pairs = [$pairs];
+        }
+
+        $filtered = collect($pairs)->filter(function ($item) {
             return $item['Type'] == 'SMS';
         })->first();
 
