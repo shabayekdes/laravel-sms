@@ -264,5 +264,4 @@ abstract class Driver
 
         return new Request($request->getMethod(), $uri);
     }
-
 }
