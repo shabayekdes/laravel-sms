@@ -56,6 +56,7 @@ class SmsManagerFeatureTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider connections
      */
     public function it_creates_drivers_without_dynamic_properties($connection)

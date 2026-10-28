@@ -25,6 +25,7 @@ class RequestTimeoutTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider operations
      */
     public function it_sends_requests_with_the_default_timeouts($connection, $service, $url, $body, $operation)
@@ -38,6 +39,7 @@ class RequestTimeoutTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider operations
      */
     public function it_sends_requests_with_the_configured_timeouts($connection, $service, $url, $body, $operation)
