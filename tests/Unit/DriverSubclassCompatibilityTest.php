@@ -2,6 +2,7 @@
 
 namespace Shabayek\Sms\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\Test;
 use Shabayek\Sms\Tests\Fixtures\LegacyOtpDriver;
 use Shabayek\Sms\Tests\TestCase;
 
@@ -16,6 +17,7 @@ use Shabayek\Sms\Tests\TestCase;
 class DriverSubclassCompatibilityTest extends TestCase
 {
     /** @test */
+    #[Test]
     public function it_loads_a_subclass_that_declares_is_valid_otp_without_a_return_type()
     {
         $script = sprintf(

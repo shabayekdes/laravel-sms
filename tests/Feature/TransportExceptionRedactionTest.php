@@ -7,6 +7,9 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\TooManyRedirectsException;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Request;
+use Illuminate\Support\Facades\Http;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use RuntimeException;
 use Shabayek\Sms\Facade\Sms;
 use Shabayek\Sms\Tests\TestCase;
@@ -34,6 +37,8 @@ class TransportExceptionRedactionTest extends TestCase
      *
      * @dataProvider operations
      */
+    #[Test]
+    #[DataProvider('operations')]
     public function it_removes_request_details_from_connection_failures($connection, $service, $url, $host, $operation)
     {
         $this->stubHttp([
@@ -63,6 +68,8 @@ class TransportExceptionRedactionTest extends TestCase
      *
      * @dataProvider operations
      */
+    #[Test]
+    #[DataProvider('operations')]
     public function it_removes_request_details_from_other_transport_failures($connection, $service, $url, $host, $operation)
     {
         $this->stubHttp([
@@ -79,12 +86,19 @@ class TransportExceptionRedactionTest extends TestCase
 
         $e = $this->catchFailure($connection, $service, $operation);
 
-        $this->assertSame(RequestException::class, get_class($e));
         $this->assertNull($e->getPrevious());
-        $this->assertFalse($e->hasResponse());
-        $this->assertSame([], $e->getHandlerContext());
         $this->assertRedacted($e);
         $this->assertStringContainsString("request to {$host} failed (cURL error 56)", $e->getMessage());
+
+        if ($this->clientConvertsRequestExceptions()) {
+            $this->assertSame(ConnectionException::class, get_class($e));
+
+            return;
+        }
+
+        $this->assertSame(RequestException::class, get_class($e));
+        $this->assertFalse($e->hasResponse());
+        $this->assertSame([], $e->getHandlerContext());
 
         $request = $e->getRequest();
         $this->assertSame($host, $request->getUri()->getHost());
@@ -94,6 +108,7 @@ class TransportExceptionRedactionTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_keeps_the_too_many_redirects_exception_type()
     {
         $this->stubHttp([
@@ -104,12 +119,21 @@ class TransportExceptionRedactionTest extends TestCase
 
         $e = $this->catchFailure('smseg', 'normal', 'send');
 
-        $this->assertSame(TooManyRedirectsException::class, get_class($e));
         $this->assertRedacted($e);
+
+        if ($this->clientConvertsRequestExceptions()) {
+            $this->assertSame(ConnectionException::class, get_class($e));
+            $this->assertNull($e->getPrevious());
+
+            return;
+        }
+
+        $this->assertSame(TooManyRedirectsException::class, get_class($e));
         $this->assertSame('', $e->getRequest()->getUri()->getQuery());
     }
 
     /** @test */
+    #[Test]
     public function it_falls_back_to_a_generic_message_without_a_request()
     {
         $this->stubHttp([
@@ -126,6 +150,7 @@ class TransportExceptionRedactionTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_does_not_change_exceptions_that_are_not_transport_failures()
     {
         $original = new RuntimeException('Not a transport failure');
@@ -196,6 +221,33 @@ class TransportExceptionRedactionTest extends TestCase
         }
 
         $this->fail("The {$operation} failure was not propagated.");
+    }
+
+    /**
+     * Determine if the Laravel client throws a ConnectionException for a
+     * Guzzle request exception without a response, as Laravel 12 does.
+     *
+     * The driver keeps the exception type the client throws.
+     *
+     * @return bool
+     */
+    private function clientConvertsRequestExceptions(): bool
+    {
+        $this->stubHttp([
+            'client-check.test/*' => function (Request $request) {
+                throw new RequestException('Client check', $request->toPsrRequest());
+            },
+        ]);
+
+        try {
+            Http::get('https://client-check.test/');
+        } catch (ConnectionException $e) {
+            return true;
+        } catch (RequestException $e) {
+            return false;
+        }
+
+        $this->fail('The client check request did not fail.');
     }
 
     /**

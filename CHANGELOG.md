@@ -14,6 +14,16 @@ All notable changes to `shabayek/laravel-sms` are documented in this file.
 
 - `composer.json` declares the Illuminate packages the package uses: `illuminate/http` and `illuminate/support` 8.83 or later, up to 13.x.
 - Tests, CI configuration and other development files are left out of the Composer dist archive.
+- CI tests every supported Laravel version, 8 through 13, with the PHP versions each one supports.
+
+### Documentation
+
+- The phone number format each gateway expects, what `balance()` returns when a gateway can't report a balance, and what the application is responsible for with OTP codes (expiry, attempt and send limits, storage, and request logging).
+- Fixed the SMS Misr and Victory Link links and the section titles in `config/sms.php`.
+
+### Upgrade notes
+
+- If `SMS_MESSAGE` (or `message` in a published config) has no `{code}` placeholder, `sendOtp()` now throws `InvalidArgumentException` instead of sending a message without the code. Add `{code}` to the message.
 
 ## v3.0 - 2026-10-28
 

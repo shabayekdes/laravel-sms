@@ -10,7 +10,7 @@ description: Send normal and OTP messages, verify codes and change the OTP text.
 ```php
 use Shabayek\Sms\Facade\Sms;
 
-$sms = Sms::send('0120000000', 'Hello world');
+$sms = Sms::send('201000000000', 'Hello world');
 ```
 
 `send()` returns an array with a response code. See [Response codes](./response-codes.md).
@@ -25,7 +25,7 @@ With service **otp**, SMS EG generates and checks the code itself, while SMS Mis
 ```php
 use Shabayek\Sms\Facade\Sms;
 
-$sms = Sms::sendOtp('0120000000');
+$sms = Sms::sendOtp('201000000000');
 ```
 
 ## Verify a phone number
@@ -33,7 +33,7 @@ $sms = Sms::sendOtp('0120000000');
 ```php
 use Shabayek\Sms\Facade\Sms;
 
-$phone = '09121234567'; // phone number
+$phone = '201000000000'; // phone number
 $otp = '123456'; // otp that you sent to phone
 $actualOtp = '123456'; // this is the actual otp that you sent to the user
 
@@ -44,7 +44,7 @@ See [OTP and verification](./otp.md) for what `sendOtp()` returns and which valu
 
 ## Change the OTP message
 
-Change the OTP message with `SMS_MESSAGE` (or `message` in `config/sms.php`). Use `{code}` where the code goes. The message can be in any language: the encoding sent to the gateway (English, Arabic or Unicode) is detected from the text.
+Change the OTP message with `SMS_MESSAGE` (or `message` in `config/sms.php`). Use `{code}` where the code goes. A message without `{code}` makes `sendOtp()` throw an `InvalidArgumentException` before anything is sent. The message can be in any language: the encoding sent to the gateway (English, Arabic or Unicode) is detected from the text.
 
 ```bash
 SMS_MESSAGE="Your verification code is: {code}"
@@ -57,5 +57,5 @@ The `Sms` facade uses the default connection. To use another connection from `co
 ```php
 use Shabayek\Sms\Facade\Sms;
 
-Sms::driver('smsmisr')->send('0120000000', 'Hello world');
+Sms::driver('smsmisr')->send('201000000000', 'Hello world');
 ```

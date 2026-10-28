@@ -4,6 +4,7 @@ namespace Shabayek\Sms\Tests\Feature;
 
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
+use PHPUnit\Framework\Attributes\Test;
 use Shabayek\Sms\Facade\Sms;
 use Shabayek\Sms\Tests\TestCase;
 
@@ -48,6 +49,7 @@ class EnvironmentIsolationFeatureTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_ignores_sms_environment_variables()
     {
         $this->assertSame('null', config('sms.default'));
@@ -59,6 +61,7 @@ class EnvironmentIsolationFeatureTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_sends_with_the_pinned_test_configuration()
     {
         $this->stubHttp([

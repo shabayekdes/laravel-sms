@@ -4,6 +4,8 @@ namespace Shabayek\Sms\Tests\Feature;
 
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Shabayek\Sms\Drivers\Ooredoo;
 use Shabayek\Sms\Facade\Sms;
 use Shabayek\Sms\Tests\TestCase;
@@ -18,6 +20,7 @@ use Shabayek\Sms\Tests\TestCase;
 class OoredooFeatureTest extends TestCase
 {
     /** @test */
+    #[Test]
     public function it_returns_the_code_when_the_otp_message_is_accepted()
     {
         $this->stubHttp([
@@ -28,6 +31,7 @@ class OoredooFeatureTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_returns_null_when_the_otp_message_is_rejected()
     {
         $this->stubHttp([
@@ -42,6 +46,8 @@ class OoredooFeatureTest extends TestCase
      *
      * @dataProvider unconfirmedResponses
      */
+    #[Test]
+    #[DataProvider('unconfirmedResponses')]
     public function it_does_not_report_success_without_provider_confirmation($body, $status)
     {
         $this->stubHttp([
@@ -59,6 +65,8 @@ class OoredooFeatureTest extends TestCase
      *
      * @dataProvider unconfirmedResponses
      */
+    #[Test]
+    #[DataProvider('unconfirmedResponses')]
     public function it_returns_null_when_the_otp_message_is_not_confirmed($body, $status)
     {
         $this->stubHttp([
@@ -69,6 +77,7 @@ class OoredooFeatureTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_sends_boolean_flags_as_literal_strings()
     {
         $this->stubHttp([

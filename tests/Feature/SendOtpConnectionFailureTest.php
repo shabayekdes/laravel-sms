@@ -5,6 +5,8 @@ namespace Shabayek\Sms\Tests\Feature;
 use GuzzleHttp\Exception\ConnectException;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Request;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Shabayek\Sms\Facade\Sms;
 use Shabayek\Sms\Tests\TestCase;
 
@@ -23,6 +25,8 @@ class SendOtpConnectionFailureTest extends TestCase
      *
      * @dataProvider otpFlows
      */
+    #[Test]
+    #[DataProvider('otpFlows')]
     public function it_propagates_connection_failures_from_send_otp($connection, $service, $url)
     {
         if ($service) {

@@ -3,6 +3,8 @@
 namespace Shabayek\Sms\Tests\Unit;
 
 use Exception;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Shabayek\Sms\Facade\Sms;
 use Shabayek\Sms\Tests\TestCase;
 
@@ -18,6 +20,8 @@ class OtpVerificationTest extends TestCase
      *
      * @dataProvider matchingOtps
      */
+    #[Test]
+    #[DataProvider('matchingOtps')]
     public function it_accepts_a_matching_otp($otp, $actualOtp)
     {
         $this->assertTrue(Sms::driver('victorylink')->verify('0123456789', $otp, $actualOtp));
@@ -28,12 +32,15 @@ class OtpVerificationTest extends TestCase
      *
      * @dataProvider rejectedOtps
      */
+    #[Test]
+    #[DataProvider('rejectedOtps')]
     public function it_rejects_a_wrong_or_malformed_otp($otp, $actualOtp)
     {
         $this->assertFalse(Sms::driver('victorylink')->verify('0123456789', $otp, $actualOtp));
     }
 
     /** @test */
+    #[Test]
     public function it_requires_the_actual_otp()
     {
         $this->expectException(Exception::class);

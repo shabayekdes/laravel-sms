@@ -4,6 +4,8 @@ namespace Shabayek\Sms\Tests\Feature;
 
 use Illuminate\Support\Facades\Http;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Shabayek\Sms\Facade\Sms;
 use Shabayek\Sms\Tests\TestCase;
 
@@ -19,6 +21,8 @@ class OtpMessageTemplateTest extends TestCase
      *
      * @dataProvider connections
      */
+    #[Test]
+    #[DataProvider('connections')]
     public function it_sends_nothing_when_the_template_has_no_code_placeholder($connection)
     {
         config()->set('sms.message', 'Your verification code is ready');

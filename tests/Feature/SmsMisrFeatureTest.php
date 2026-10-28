@@ -4,6 +4,8 @@ namespace Shabayek\Sms\Tests\Feature;
 
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Shabayek\Sms\Facade\Sms;
 use Shabayek\Sms\Tests\TestCase;
 
@@ -15,6 +17,7 @@ use Shabayek\Sms\Tests\TestCase;
 class SmsMisrFeatureTest extends TestCase
 {
     /** @test */
+    #[Test]
     public function it_can_smsmisr_send_sms_message_successfully()
     {
         $this->setConfig('smsmisr');
@@ -33,6 +36,7 @@ class SmsMisrFeatureTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function test_smsmisr_not_sent_message()
     {
         $this->setConfig('smsmisr');
@@ -51,6 +55,7 @@ class SmsMisrFeatureTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_accepts_the_success_code_as_a_string()
     {
         $this->setConfig('smsmisr');
@@ -67,6 +72,8 @@ class SmsMisrFeatureTest extends TestCase
      *
      * @dataProvider unconfirmedResponses
      */
+    #[Test]
+    #[DataProvider('unconfirmedResponses')]
     public function it_does_not_report_success_without_provider_confirmation($body, $status)
     {
         $this->setConfig('smsmisr');
@@ -82,6 +89,7 @@ class SmsMisrFeatureTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_returns_the_code_when_the_otp_message_is_accepted()
     {
         $this->setConfig('smsmisr');
@@ -94,6 +102,7 @@ class SmsMisrFeatureTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_returns_null_when_the_otp_message_is_rejected()
     {
         $this->setConfig('smsmisr');
@@ -112,6 +121,7 @@ class SmsMisrFeatureTest extends TestCase
      *
      * @test
      */
+    #[Test]
     public function it_sends_the_generated_code_with_the_otp_service()
     {
         $this->setConfig('smsmisr');
@@ -131,6 +141,7 @@ class SmsMisrFeatureTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_returns_null_when_the_otp_service_request_fails()
     {
         $this->setConfig('smsmisr');
@@ -144,6 +155,7 @@ class SmsMisrFeatureTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_returns_null_and_sends_nothing_for_an_unknown_service()
     {
         $this->setConfig('smsmisr');

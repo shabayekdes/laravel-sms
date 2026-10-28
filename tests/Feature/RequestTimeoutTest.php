@@ -4,6 +4,8 @@ namespace Shabayek\Sms\Tests\Feature;
 
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Shabayek\Sms\Facade\Sms;
 use Shabayek\Sms\Tests\TestCase;
 
@@ -28,6 +30,8 @@ class RequestTimeoutTest extends TestCase
      *
      * @dataProvider operations
      */
+    #[Test]
+    #[DataProvider('operations')]
     public function it_sends_requests_with_the_default_timeouts($connection, $service, $url, $body, $operation)
     {
         $this->runOperation($connection, $service, $url, $body, $operation);
@@ -42,6 +46,8 @@ class RequestTimeoutTest extends TestCase
      *
      * @dataProvider operations
      */
+    #[Test]
+    #[DataProvider('operations')]
     public function it_sends_requests_with_the_configured_timeouts($connection, $service, $url, $body, $operation)
     {
         // Values read from the environment arrive as strings.
@@ -56,6 +62,7 @@ class RequestTimeoutTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_falls_back_to_the_default_timeouts_when_the_keys_are_missing()
     {
         config()->set('sms', array_diff_key(config('sms'), ['timeout' => true, 'connect_timeout' => true]));

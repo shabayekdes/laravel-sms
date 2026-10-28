@@ -2,6 +2,8 @@
 
 namespace Shabayek\Sms\Tests\Feature;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use RuntimeException;
 use Shabayek\Sms\Facade\Sms;
 use Shabayek\Sms\Tests\TestCase;
@@ -18,6 +20,8 @@ class TestSafetyFeatureTest extends TestCase
      *
      * @dataProvider connections
      */
+    #[Test]
+    #[DataProvider('connections')]
     public function it_blocks_requests_without_a_stub($connection)
     {
         $this->expectException(RuntimeException::class);
@@ -27,6 +31,7 @@ class TestSafetyFeatureTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_does_not_include_credentials_in_the_blocked_request_message()
     {
         try {
@@ -38,6 +43,7 @@ class TestSafetyFeatureTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_uses_test_credentials_instead_of_environment_values()
     {
         foreach (['smseg', 'smsmisr', 'victorylink', 'ooredoo'] as $connection) {

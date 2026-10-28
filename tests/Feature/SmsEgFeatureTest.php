@@ -4,6 +4,8 @@ namespace Shabayek\Sms\Tests\Feature;
 
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Shabayek\Sms\Enums\ResponseCode;
 use Shabayek\Sms\Facade\Sms;
 use Shabayek\Sms\Tests\TestCase;
@@ -16,6 +18,7 @@ use Shabayek\Sms\Tests\TestCase;
 class SmsEgFeatureTest extends TestCase
 {
     /** @test */
+    #[Test]
     public function it_can_smseg_send_sms_message_successfully()
     {
         $this->setConfig('smseg');
@@ -45,6 +48,7 @@ class SmsEgFeatureTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function test_smseg_not_sent_message()
     {
         $this->setConfig('smseg');
@@ -74,6 +78,7 @@ class SmsEgFeatureTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_returns_the_smseg_error_message_as_provider_details_on_rejection()
     {
         $this->setConfig('smseg');
@@ -95,6 +100,8 @@ class SmsEgFeatureTest extends TestCase
      *
      * @dataProvider unconfirmedResponses
      */
+    #[Test]
+    #[DataProvider('unconfirmedResponses')]
     public function it_does_not_report_success_without_provider_confirmation($body, $status)
     {
         $this->setConfig('smseg');
@@ -110,6 +117,7 @@ class SmsEgFeatureTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_returns_the_code_when_the_otp_message_is_accepted()
     {
         $this->setConfig('smseg');
@@ -126,6 +134,7 @@ class SmsEgFeatureTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_returns_null_when_the_otp_message_is_rejected()
     {
         $this->setConfig('smseg');
@@ -138,6 +147,7 @@ class SmsEgFeatureTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_returns_null_when_the_otp_message_gets_a_server_error()
     {
         $this->setConfig('smseg');
@@ -150,6 +160,7 @@ class SmsEgFeatureTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_sends_a_provider_managed_otp_with_the_otp_service()
     {
         $this->setConfig('smseg');
@@ -168,6 +179,7 @@ class SmsEgFeatureTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_verifies_a_provider_managed_otp()
     {
         $this->setConfig('smseg');
@@ -181,6 +193,7 @@ class SmsEgFeatureTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_rejects_a_provider_managed_otp_the_provider_rejects()
     {
         $this->setConfig('smseg');
@@ -198,6 +211,8 @@ class SmsEgFeatureTest extends TestCase
      *
      * @dataProvider unsuccessfulVerificationResponses
      */
+    #[Test]
+    #[DataProvider('unsuccessfulVerificationResponses')]
     public function it_rejects_a_provider_managed_otp_when_verification_is_unsuccessful($body, $status)
     {
         $this->setConfig('smseg');
@@ -211,6 +226,7 @@ class SmsEgFeatureTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_returns_null_and_sends_nothing_for_an_unknown_service()
     {
         $this->setConfig('smseg');
@@ -222,6 +238,7 @@ class SmsEgFeatureTest extends TestCase
     }
 
     /** @test */
+    #[Test]
     public function it_does_not_send_a_malformed_otp_to_the_provider()
     {
         $this->setConfig('smseg');
